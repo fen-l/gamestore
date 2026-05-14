@@ -1,8 +1,20 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, ShoppingCart, User, Menu, X, Search, Sun, Moon, Dice5, UserPlus } from "lucide-react";
+import {
+  Heart,
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  Search,
+  Sun,
+  Moon,
+  Dice5,
+  UserPlus,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart, useFavorites, useTheme } from "@/store/useStore";
 import { GAMES } from "@/data/games";
+import { useProfile } from "@/store/profile";
 
 export function Navbar() {
   const cartItems = useCart((s) => s.items);
@@ -13,8 +25,12 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const isAuth = useProfile((s) => s.isAuth);
+  const user = useProfile((s) => s.user);
 
-  useEffect(() => { initTheme(); }, [initTheme]);
+  useEffect(() => {
+    initTheme();
+  }, [initTheme]);
 
   const cartCount = cartItems.reduce((a, i) => a + i.quantity, 0);
   const cartTotal = cartItems.reduce((sum, i) => {
@@ -41,7 +57,9 @@ export function Navbar() {
             <div className="w-10 h-10 rounded-xl gradient-amber flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform">
               <Dice5 className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-gradient hidden sm:block">МирИгр</span>
+            <span className="text-xl font-bold text-gradient hidden sm:block">
+              МирИгр
+            </span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
@@ -58,7 +76,10 @@ export function Navbar() {
             ))}
           </nav>
 
-          <form onSubmit={submitSearch} className="hidden md:flex flex-1 max-w-xs relative">
+          <form
+            onSubmit={submitSearch}
+            className="hidden md:flex flex-1 max-w-xs relative"
+          >
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={query}
@@ -74,10 +95,17 @@ export function Navbar() {
               aria-label="Переключить тему"
               className="p-2.5 rounded-xl hover:bg-accent transition-colors"
             >
-              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {theme === "dark" ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
             </button>
 
-            <Link to="/favorites" className="relative p-2.5 rounded-xl hover:bg-accent transition-colors">
+            <Link
+              to="/favorites"
+              className="relative p-2.5 rounded-xl hover:bg-accent transition-colors"
+            >
               <Heart className="w-5 h-5" />
               {favIds.length > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 rounded-full gradient-amber text-[11px] font-bold text-primary-foreground flex items-center justify-center animate-scale-in">
@@ -86,7 +114,10 @@ export function Navbar() {
               )}
             </Link>
 
-            <Link to="/cart" className="relative p-2.5 rounded-xl hover:bg-accent transition-colors flex items-center gap-2">
+            <Link
+              to="/cart"
+              className="relative p-2.5 rounded-xl hover:bg-accent transition-colors flex items-center gap-2"
+            >
               <div className="relative">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
@@ -101,13 +132,37 @@ export function Navbar() {
                 </span>
               )}
             </Link>
+            {isAuth ? (
+              <>
+                <Link
+                  to="/profile"
+                  className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-accent transition"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="text-sm font-medium">
+                    {user?.name ?? "Профиль"}
+                  </span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-accent transition"
+                >
+                  <User className="w-5 h-5" />
+                  Войти
+                </Link>
 
-            <Link to="/profile" className="p-2.5 rounded-xl hover:bg-accent transition-colors hidden sm:flex">
-              <User className="w-5 h-5" />
-            </Link>
-            <Link to="/profile" className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl gradient-amber text-primary-foreground text-sm font-semibold hover:shadow-glow transition-all">
-              <UserPlus className="w-4 h-4" /> Регистрация
-            </Link>
+                <Link
+                  to="/register"
+                  className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl gradient-amber text-primary-foreground text-sm font-semibold"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Регистрация
+                </Link>
+              </>
+            )}
 
             <button
               onClick={() => setOpen((o) => !o)}
@@ -132,13 +187,36 @@ export function Navbar() {
             </form>
             <nav className="flex flex-col gap-1">
               {navLinks.map((l) => (
-                <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  onClick={() => setOpen(false)}
+                  className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium"
+                >
                   {l.label}
                 </Link>
               ))}
-              <Link to="/favorites" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">Избранное</Link>
-              <Link to="/cart" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">Корзина</Link>
-              <Link to="/profile" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium">Профиль</Link>
+              <Link
+                to="/favorites"
+                onClick={() => setOpen(false)}
+                className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium"
+              >
+                Избранное
+              </Link>
+              <Link
+                to="/cart"
+                onClick={() => setOpen(false)}
+                className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium"
+              >
+                Корзина
+              </Link>
+              <Link
+                to="/profile"
+                onClick={() => setOpen(false)}
+                className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium"
+              >
+                Профиль
+              </Link>
             </nav>
           </div>
         )}

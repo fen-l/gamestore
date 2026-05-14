@@ -1,16 +1,40 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { User, MapPin, Bell, LogOut, Camera, Package } from "lucide-react";
+import { useProfile } from "@/store/profile";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/profile")({
+  beforeLoad: () => {
+    const auth = useProfile.getState();
+
+    if (!auth.isAuth) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
+
   component: ProfilePage,
   head: () => ({ meta: [{ title: "Профиль — МирИгр" }] }),
 });
 
 const ORDERS = [
-  { id: "#10234", date: "2025-04-10", total: 5790, status: "Доставлен", items: 2 },
+  {
+    id: "#10234",
+    date: "2025-04-10",
+    total: 5790,
+    status: "Доставлен",
+    items: 2,
+  },
   { id: "#10198", date: "2025-03-22", total: 2490, status: "В пути", items: 1 },
-  { id: "#10155", date: "2025-02-14", total: 9890, status: "Доставлен", items: 3 },
+  {
+    id: "#10155",
+    date: "2025-02-14",
+    total: 9890,
+    status: "Доставлен",
+    items: 3,
+  },
 ];
 
 const TABS = [
@@ -21,11 +45,15 @@ const TABS = [
 ] as const;
 
 function ProfilePage() {
-  const [tab, setTab] = useState<typeof TABS[number]["id"]>("info");
-  const [name, setName] = useState("Иван Иванов");
-  const [email, setEmail] = useState("ivan@example.com");
-  const [phone, setPhone] = useState("+7 999 123-45-67");
-  const [notifs, setNotifs] = useState({ orders: true, promos: true, news: false });
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("info");
+  const navigate = useNavigate();
+
+  const { user, notifications, updateUser, updateNotifications, logout } =
+    useProfile();
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -36,51 +64,88 @@ function ProfilePage() {
           <div className="bg-card border border-border rounded-2xl p-6 text-center">
             <div className="relative w-24 h-24 mx-auto mb-3">
               <div className="w-24 h-24 rounded-full gradient-amber flex items-center justify-center text-3xl font-bold text-primary-foreground shadow-soft">
-                {name.charAt(0)}
+                {user.name.charAt(0)}
               </div>
               <button className="absolute bottom-0 right-0 p-2 rounded-full bg-foreground text-background shadow-soft">
                 <Camera className="w-3.5 h-3.5" />
               </button>
             </div>
-            <div className="font-bold">{name}</div>
-            <div className="text-sm text-muted-foreground">{email}</div>
+            <div className="font-bold">{user.name}</div>
+            <div className="text-sm text-muted-foreground">{user.email}</div>
           </div>
           {TABS.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition ${
-                tab === t.id ? "gradient-amber text-primary-foreground shadow-soft" : "hover:bg-accent"
+                tab === t.id
+                  ? "gradient-amber text-primary-foreground shadow-soft"
+                  : "hover:bg-accent"
               }`}
             >
               <t.icon className="w-4 h-4" /> {t.label}
             </button>
           ))}
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm text-destructive hover:bg-destructive/10 transition">
+          <button
+            onClick={() => {
+              logout();
+
+              navigate({
+                to: "/",
+              });
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm text-destructive hover:bg-destructive/10 transition"
+          >
             <LogOut className="w-4 h-4" /> Выйти
           </button>
         </aside>
 
         <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 animate-fade-in">
           {tab === "info" && (
-            <form className="max-w-xl space-y-5" onSubmit={(e) => { e.preventDefault(); alert("Сохранено"); }}>
+            <form
+              className="max-w-xl space-y-5"
+              onSubmit={(e) => {
+                e.preventDefault();
+              }}
+            >
               <h2 className="text-xl font-bold mb-4">Личные данные</h2>
               {[
-                ["Имя", name, setName, "text"],
-                ["Email", email, setEmail, "email"],
-                ["Телефон", phone, setPhone, "tel"],
+                [
+                  "Имя",
+                  user.name,
+                  (value: string) => updateUser({ name: value }),
+                  "text",
+                ],
+                [
+                  "Email",
+                  user.email,
+                  (value: string) => updateUser({ email: value }),
+                  "email",
+                ],
+                [
+                  "Телефон",
+                  user.phone,
+                  (value: string) => updateUser({ phone: value }),
+                  "tel",
+                ],
               ].map(([l, v, set, type]) => (
                 <div key={l as string}>
-                  <label className="text-sm font-semibold mb-1.5 block">{l as string}</label>
+                  <label className="text-sm font-semibold mb-1.5 block">
+                    {l as string}
+                  </label>
                   <input
                     type={type as string}
                     value={v as string}
-                    onChange={(e) => (set as (v: string) => void)(e.target.value)}
+                    onChange={(e) =>
+                      (set as (v: string) => void)(e.target.value)
+                    }
                     className="w-full px-4 py-2.5 rounded-xl bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
               ))}
-              <button className="px-6 py-3 rounded-xl gradient-amber text-primary-foreground font-bold">Сохранить</button>
+              <button className="px-6 py-3 rounded-xl gradient-amber text-primary-foreground font-bold">
+                Сохранить
+              </button>
             </form>
           )}
 
@@ -91,20 +156,35 @@ function ProfilePage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-muted-foreground border-b border-border">
-                      <th className="py-3">Заказ</th><th>Дата</th><th>Товаров</th><th>Сумма</th><th>Статус</th>
+                      <th className="py-3">Заказ</th>
+                      <th>Дата</th>
+                      <th>Товаров</th>
+                      <th>Сумма</th>
+                      <th>Статус</th>
                     </tr>
                   </thead>
                   <tbody>
                     {ORDERS.map((o) => (
-                      <tr key={o.id} className="border-b border-border last:border-0">
+                      <tr
+                        key={o.id}
+                        className="border-b border-border last:border-0"
+                      >
                         <td className="py-4 font-bold">{o.id}</td>
                         <td>{o.date}</td>
                         <td>{o.items}</td>
-                        <td className="font-semibold">{o.total.toLocaleString("ru-RU")} ₽</td>
+                        <td className="font-semibold">
+                          {o.total.toLocaleString("ru-RU")} ₽
+                        </td>
                         <td>
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            o.status === "Доставлен" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
-                          }`}>{o.status}</span>
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              o.status === "Доставлен"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-amber-100 text-amber-700"
+                            }`}
+                          >
+                            {o.status}
+                          </span>
                         </td>
                       </tr>
                     ))}
@@ -122,7 +202,10 @@ function ProfilePage() {
                   { l: "Дом", a: "Москва, ул. Игровая, 1, кв. 42" },
                   { l: "Работа", a: "Москва, Тверская, 15, офис 305" },
                 ].map((a, i) => (
-                  <div key={i} className="bg-muted rounded-xl p-4 flex items-start gap-3">
+                  <div
+                    key={i}
+                    className="bg-muted rounded-xl p-4 flex items-start gap-3"
+                  >
                     <MapPin className="w-5 h-5 text-primary mt-0.5" />
                     <div>
                       <div className="font-bold">{a.l}</div>
@@ -146,12 +229,19 @@ function ProfilePage() {
                   { k: "promos" as const, l: "Акции и скидки" },
                   { k: "news" as const, l: "Новости магазина" },
                 ].map((n) => (
-                  <label key={n.k} className="flex items-center justify-between p-4 bg-muted rounded-xl cursor-pointer">
+                  <label
+                    key={n.k}
+                    className="flex items-center justify-between p-4 bg-muted rounded-xl cursor-pointer"
+                  >
                     <span className="font-medium">{n.l}</span>
                     <input
                       type="checkbox"
-                      checked={notifs[n.k]}
-                      onChange={(e) => setNotifs({ ...notifs, [n.k]: e.target.checked })}
+                      checked={notifications[n.k]}
+                      onChange={(e) =>
+                        updateNotifications({
+                          [n.k]: e.target.checked,
+                        })
+                      }
                       className="w-5 h-5 accent-primary"
                     />
                   </label>
