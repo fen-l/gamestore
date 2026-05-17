@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { User, MapPin, Bell, LogOut, Camera, Package } from "lucide-react";
+import { User, MapPin, LogOut, Camera, Package } from "lucide-react";
 import { useProfile } from "@/store/profile";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -41,15 +41,13 @@ const TABS = [
   { id: "info", label: "Личные данные", icon: User },
   { id: "orders", label: "История заказов", icon: Package },
   { id: "addresses", label: "Адреса", icon: MapPin },
-  { id: "notifications", label: "Уведомления", icon: Bell },
 ] as const;
 
 function ProfilePage() {
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("info");
   const navigate = useNavigate();
 
-  const { user, notifications, updateUser, updateNotifications, logout } =
-    useProfile();
+  const { user, updateUser, logout } = useProfile();
 
   if (!user) {
     return null;
@@ -66,9 +64,6 @@ function ProfilePage() {
               <div className="w-24 h-24 rounded-full gradient-amber flex items-center justify-center text-3xl font-bold text-primary-foreground shadow-soft">
                 {user.name.charAt(0)}
               </div>
-              <button className="absolute bottom-0 right-0 p-2 rounded-full bg-foreground text-background shadow-soft">
-                <Camera className="w-3.5 h-3.5" />
-              </button>
             </div>
             <div className="font-bold">{user.name}</div>
             <div className="text-sm text-muted-foreground">{user.email}</div>
@@ -216,36 +211,6 @@ function ProfilePage() {
                 <button className="w-full py-3 rounded-xl border-2 border-dashed border-border text-sm font-semibold hover:bg-accent transition">
                   + Добавить адрес
                 </button>
-              </div>
-            </div>
-          )}
-
-          {tab === "notifications" && (
-            <div>
-              <h2 className="text-xl font-bold mb-4">Уведомления</h2>
-              <div className="space-y-3">
-                {[
-                  { k: "orders" as const, l: "Статусы заказов" },
-                  { k: "promos" as const, l: "Акции и скидки" },
-                  { k: "news" as const, l: "Новости магазина" },
-                ].map((n) => (
-                  <label
-                    key={n.k}
-                    className="flex items-center justify-between p-4 bg-muted rounded-xl cursor-pointer"
-                  >
-                    <span className="font-medium">{n.l}</span>
-                    <input
-                      type="checkbox"
-                      checked={notifications[n.k]}
-                      onChange={(e) =>
-                        updateNotifications({
-                          [n.k]: e.target.checked,
-                        })
-                      }
-                      className="w-5 h-5 accent-primary"
-                    />
-                  </label>
-                ))}
               </div>
             </div>
           )}

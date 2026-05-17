@@ -1,12 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type Notifications = {
-  orders: boolean;
-  promos: boolean;
-  news: boolean;
-};
-
 type User = {
   name: string;
   email: string;
@@ -17,7 +11,6 @@ type User = {
 type ProfileState = {
   isAuth: boolean;
   user: User | null;
-  notifications: Notifications;
 
   register: (
     name: string,
@@ -31,8 +24,6 @@ type ProfileState = {
   logout: () => void;
 
   updateUser: (data: Partial<User>) => void;
-
-  updateNotifications: (data: Partial<Notifications>) => void;
 };
 
 export const useProfile = create<ProfileState>()(
@@ -41,12 +32,6 @@ export const useProfile = create<ProfileState>()(
       isAuth: false,
 
       user: null,
-
-      notifications: {
-        orders: true,
-        promos: true,
-        news: false,
-      },
 
       register: (name, email, phone, password) => {
         const users = JSON.parse(localStorage.getItem("users") || "[]");
@@ -117,14 +102,6 @@ export const useProfile = create<ProfileState>()(
                 ...data,
               }
             : null,
-        })),
-
-      updateNotifications: (data) =>
-        set((s) => ({
-          notifications: {
-            ...s.notifications,
-            ...data,
-          },
         })),
     }),
     {

@@ -102,36 +102,41 @@ export function Navbar() {
               )}
             </button>
 
-            <Link
-              to="/favorites"
-              className="relative p-2.5 rounded-xl hover:bg-accent transition-colors"
-            >
-              <Heart className="w-5 h-5" />
-              {favIds.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 rounded-full gradient-amber text-[11px] font-bold text-primary-foreground flex items-center justify-center animate-scale-in">
-                  {favIds.length}
-                </span>
-              )}
-            </Link>
+            {isAuth && (
+              <>
+                <Link
+                  to="/favorites"
+                  className="relative p-2.5 rounded-xl hover:bg-accent transition-colors"
+                >
+                  <Heart className="w-5 h-5" />
+                  {favIds.length > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 rounded-full gradient-amber text-[11px] font-bold text-primary-foreground flex items-center justify-center animate-scale-in">
+                      {favIds.length}
+                    </span>
+                  )}
+                </Link>
 
-            <Link
-              to="/cart"
-              className="relative p-2.5 rounded-xl hover:bg-accent transition-colors flex items-center gap-2"
-            >
-              <div className="relative">
-                <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full gradient-amber text-[11px] font-bold text-primary-foreground flex items-center justify-center animate-scale-in">
-                    {cartCount}
-                  </span>
-                )}
-              </div>
-              {cartTotal > 0 && (
-                <span className="hidden xl:inline text-sm font-semibold">
-                  {cartTotal.toLocaleString("ru-RU")} ₽
-                </span>
-              )}
-            </Link>
+                <Link
+                  to="/cart"
+                  className="relative p-2.5 rounded-xl hover:bg-accent transition-colors flex items-center gap-2"
+                >
+                  <div className="relative">
+                    <ShoppingCart className="w-5 h-5" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full gradient-amber text-[11px] font-bold text-primary-foreground flex items-center justify-center animate-scale-in">
+                        {cartCount}
+                      </span>
+                    )}
+                  </div>
+
+                  {cartTotal > 0 && (
+                    <span className="hidden xl:inline text-sm font-semibold">
+                      {cartTotal.toLocaleString("ru-RU")} ₽
+                    </span>
+                  )}
+                </Link>
+              </>
+            )}
             {isAuth ? (
               <>
                 <Link
