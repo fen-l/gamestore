@@ -1,6 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+type Address = {
+  id: string;
+  label: string; // "Дом", "Работа"
+  city: string;
+  address: string; // улица, дом, квартира
+  comment?: string;
+};
+
 type User = {
   name: string;
   email: string;
@@ -24,6 +32,13 @@ type ProfileState = {
   logout: () => void;
 
   updateUser: (data: Partial<User>) => void;
+  addresses: Address[];
+  lastUsedAddressId: string | null;
+  setLastUsedAddressId: (id: string) => void;
+
+  addAddress: (addr: Omit<Address, "id">) => string;
+  removeAddress: (id: string) => void;
+  updateAddress: (id: string, addr: Partial<Address>) => void;
 };
 
 export const useProfile = create<ProfileState>()(
@@ -32,6 +47,36 @@ export const useProfile = create<ProfileState>()(
       isAuth: false,
 
       user: null,
+      addresses: [],
+      lastUsedAddressId: null,
+
+      setLastUsedAddressId: (id) =>
+        set(() => ({
+          lastUsedAddressId: id,
+        })),
+
+      addAddress: (addr) => {
+        const id = crypto.randomUUID();
+
+        set((s) => ({
+          addresses: [...s.addresses, { id, ...addr }],
+          lastUsedAddressId: id,
+        }));
+
+        return id;
+      },
+
+      removeAddress: (id) =>
+        set((s) => ({
+          addresses: s.addresses.filter((a) => a.id !== id),
+        })),
+
+      updateAddress: (id, data) =>
+        set((s) => ({
+          addresses: s.addresses.map((a) =>
+            a.id === id ? { ...a, ...data } : a,
+          ),
+        })),
 
       register: (name, email, phone, password) => {
         const users = JSON.parse(localStorage.getItem("users") || "[]");

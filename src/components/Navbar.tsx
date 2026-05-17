@@ -12,12 +12,13 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useCart, useFavorites, useTheme } from "@/store/useStore";
+import { useFavorites, useTheme } from "@/store/useStore";
+import { useCart } from "@/store/useCart";
 import { GAMES } from "@/data/games";
-import { useProfile } from "@/store/profile";
+import { useProfile } from "../store/useProfile";
 
 export function Navbar() {
-  const cartItems = useCart((s) => s.items);
+  const { items, promoCode, discount } = useCart();
   const favIds = useFavorites((s) => s.ids);
   const theme = useTheme((s) => s.theme);
   const toggleTheme = useTheme((s) => s.toggle);
@@ -32,11 +33,14 @@ export function Navbar() {
     initTheme();
   }, [initTheme]);
 
-  const cartCount = cartItems.reduce((a, i) => a + i.quantity, 0);
-  const cartTotal = cartItems.reduce((sum, i) => {
+  const cartCount = items.reduce((a, i) => a + i.quantity, 0);
+
+  const cartTotal = items.reduce((sum, i) => {
     const g = GAMES.find((g) => g.id === i.gameId);
     return sum + (g ? g.price * i.quantity : 0);
   }, 0);
+  const discountAmt = Math.round(cartTotal * discount);
+  const finalTotal = cartTotal - discountAmt;
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,9 +133,9 @@ export function Navbar() {
                     )}
                   </div>
 
-                  {cartTotal > 0 && (
+                  {finalTotal > 0 && (
                     <span className="hidden xl:inline text-sm font-semibold">
-                      {cartTotal.toLocaleString("ru-RU")} ₽
+                      {finalTotal.toLocaleString("ru-RU")} руб
                     </span>
                   )}
                 </Link>

@@ -31,24 +31,3 @@ export type BoardGame = {
   tags: string[];
   reviews: Review[];
 };
-
-export type CartItem = {
-  gameId: string;
-  quantity: number;
-};
-
-export type Order = {
-  id: string;
-  date: string;
-  total: number;
-  status: "Доставлен" | "В пути" | "Обработка" | "Отменён";
-  items: number;
-};
-
-export type Address = {
-  id: string;
-  label: string;
-  city: string;
-  street: string;
-  zip: string;
-};

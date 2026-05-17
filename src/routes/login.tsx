@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { useProfile } from "@/store/profile";
+import { useProfile } from "../store/useProfile";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: () => {

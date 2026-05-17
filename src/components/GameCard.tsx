@@ -1,15 +1,21 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, ShoppingCart, Star, Users, Clock } from "lucide-react";
 import type { BoardGame } from "@/types";
-import { useCart, useFavorites } from "@/store/useStore";
-import { useProfile } from "@/store/profile";
+import { useFavorites } from "@/store/useStore";
+import { useProfile } from "../store/useProfile";
+import { useCart } from "@/store/useCart";
 
 export function GameCard({ game }: { game: BoardGame }) {
   const addCart = useCart((s) => s.add);
+  const cartItems = useCart((s) => s.items);
+
   const fav = useFavorites();
   const isFav = fav.ids.includes(game.id);
+
   const navigate = useNavigate();
   const isAuth = useProfile((s) => s.isAuth);
+
+  const inCartQty = cartItems.find((i) => i.gameId === game.id)?.quantity ?? 0;
 
   return (
     <div className="group relative bg-card rounded-2xl overflow-hidden card-hover border border-border animate-fade-in">
@@ -95,11 +101,11 @@ export function GameCard({ game }: { game: BoardGame }) {
         <div className="flex items-end justify-between mt-4">
           <div>
             <div className="text-lg font-bold">
-              {game.price.toLocaleString("ru-RU")} ₽
+              {game.price.toLocaleString("ru-RU")} руб
             </div>
             {game.oldPrice && (
               <div className="text-xs text-muted-foreground line-through">
-                {game.oldPrice.toLocaleString("ru-RU")} ₽
+                {game.oldPrice.toLocaleString("ru-RU")} руб
               </div>
             )}
           </div>

@@ -220,7 +220,7 @@ function CatalogPage() {
 
       <div>
         <label className="text-sm font-bold mb-2 block">
-          Цена до: {priceMax.toLocaleString("ru-RU")} ₽
+          Цена до: {priceMax.toLocaleString("ru-RU")} руб
         </label>
         <input
           type="range"
