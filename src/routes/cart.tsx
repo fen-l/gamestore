@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Trash2,
@@ -11,6 +11,7 @@ import {
 import { useCart } from "@/store/useCart";
 import { GAMES } from "@/data/games";
 import { GameCard } from "@/components/GameCard";
+import { useProfile } from "@/store/useProfile.ts";
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
@@ -18,19 +19,30 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { items, setQty, remove, promoCode, discount, applyPromo } = useCart();
-  const [promo, setPromo] = useState(promoCode);
+  const navigate = useNavigate();
+  const user = useProfile((s) => s.user);
+  const userCart = useCart((s) => (user ? s.carts[user.email] : undefined));
+  const cart = userCart ?? {
+    items: [],
+    promoCode: "",
+    discount: 0,
+  };
+  const { setQty, remove, applyPromo } = useCart();
+  const [promo, setPromo] = useState(cart.promoCode);
 
-  const detailed = items
+  const detailed = cart.items
     .map((i) => ({ ...i, game: GAMES.find((g) => g.id === i.gameId)! }))
     .filter((i) => i.game);
 
   const subtotal = detailed.reduce((s, i) => s + i.game.price * i.quantity, 0);
-  const discountAmt = Math.round(subtotal * discount);
+  const discountAmt = Math.round(subtotal * cart.discount);
   const total = subtotal - discountAmt;
 
   const handleApplyPromo = () => {
-    const success = applyPromo(promo);
+    if (!user) {
+      return;
+    }
+    const success = applyPromo(user.email, promo);
 
     if (!success) {
       alert("Промокод не найден");
@@ -38,7 +50,7 @@ function CartPage() {
   };
 
   const recommend = GAMES.filter(
-    (g) => !items.some((i) => i.gameId === g.id),
+    (g) => !cart.items.some((i) => i.gameId === g.id),
   ).slice(0, 4);
 
   if (detailed.length === 0) {
@@ -98,7 +110,14 @@ function CartPage() {
                 <div className="flex items-center justify-between mt-3 gap-3">
                   <div className="flex items-center bg-muted rounded-xl">
                     <button
-                      onClick={() => setQty(i.gameId, i.quantity - 1)}
+                      onClick={() => {
+                        if (!user) {
+                          navigate({ to: "/login" });
+                          return;
+                        }
+
+                        setQty(user.email, i.gameId, i.quantity - 1);
+                      }}
                       className="p-2 hover:bg-accent rounded-l-xl"
                     >
                       <Minus className="w-4 h-4" />
@@ -107,14 +126,28 @@ function CartPage() {
                       {i.quantity}
                     </span>
                     <button
-                      onClick={() => setQty(i.gameId, i.quantity + 1)}
+                      onClick={() => {
+                        if (!user) {
+                          navigate({ to: "/login" });
+                          return;
+                        }
+
+                        setQty(user.email, i.gameId, i.quantity + 1);
+                      }}
                       className="p-2 hover:bg-accent rounded-r-xl"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
                   <button
-                    onClick={() => remove(i.gameId)}
+                    onClick={() => {
+                      if (!user) {
+                        navigate({ to: "/login" });
+                        return;
+                      }
+
+                      remove(user.email, i.gameId);
+                    }}
                     className="p-2 text-muted-foreground hover:text-destructive transition"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -146,9 +179,10 @@ function CartPage() {
             <p className="text-xs text-muted-foreground mb-4">
               Попробуйте: GAME10 или MIR20
             </p>
-            {promoCode && discount > 0 && (
+            {cart.promoCode && cart.discount > 0 && (
               <div className="mb-4 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm text-green-600">
-                Промокод <span className="font-bold">{promoCode}</span> применён
+                Промокод <span className="font-bold">{cart.promoCode}</span>{" "}
+                применён
               </div>
             )}
 

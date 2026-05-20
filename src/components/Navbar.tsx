@@ -12,34 +12,42 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useFavorites, useTheme } from "@/store/useStore";
+import { useTheme } from "@/store/useStore";
 import { useCart } from "@/store/useCart";
 import { GAMES } from "@/data/games";
 import { useProfile } from "../store/useProfile";
+import { useFavorites } from "@/store/useFavorites";
 
 export function Navbar() {
-  const { items, promoCode, discount } = useCart();
-  const favIds = useFavorites((s) => s.ids);
+  const user = useProfile((s) => s.user);
   const theme = useTheme((s) => s.theme);
   const toggleTheme = useTheme((s) => s.toggle);
   const initTheme = useTheme((s) => s.init);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const isAuth = useProfile((s) => s.isAuth);
-  const user = useProfile((s) => s.user);
+  const userCart = useCart((s) => (user ? s.carts[user.email] : undefined));
+  const cart = userCart ?? {
+    items: [],
+    promoCode: "",
+    discount: 0,
+  };
+  const favorites = useFavorites((s) =>
+    user ? s.favorites[user.email] : undefined,
+  );
+  const favIds = favorites ?? [];
 
   useEffect(() => {
     initTheme();
   }, [initTheme]);
 
-  const cartCount = items.reduce((a, i) => a + i.quantity, 0);
+  const cartCount = cart.items.reduce((a, i) => a + i.quantity, 0);
 
-  const cartTotal = items.reduce((sum, i) => {
+  const cartTotal = cart.items.reduce((sum, i) => {
     const g = GAMES.find((g) => g.id === i.gameId);
     return sum + (g ? g.price * i.quantity : 0);
   }, 0);
-  const discountAmt = Math.round(cartTotal * discount);
+  const discountAmt = Math.round(cartTotal * cart.discount);
   const finalTotal = cartTotal - discountAmt;
 
   const submitSearch = (e: React.FormEvent) => {
@@ -106,7 +114,7 @@ export function Navbar() {
               )}
             </button>
 
-            {isAuth && (
+            {user && (
               <>
                 <Link
                   to="/favorites"
@@ -141,7 +149,7 @@ export function Navbar() {
                 </Link>
               </>
             )}
-            {isAuth ? (
+            {user ? (
               <>
                 <Link
                   to="/profile"

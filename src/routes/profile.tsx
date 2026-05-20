@@ -9,7 +9,7 @@ export const Route = createFileRoute("/profile")({
   beforeLoad: () => {
     const auth = useProfile.getState();
 
-    if (!auth.isAuth) {
+    if (!auth.user) {
       throw redirect({
         to: "/login",
       });

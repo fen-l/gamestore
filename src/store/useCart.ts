@@ -1,104 +1,163 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type CartItem = { gameId: string; quantity: number };
+type CartItem = {
+  gameId: string;
+  quantity: number;
+};
 
-type CartState = {
+type UserCart = {
   items: CartItem[];
 
   promoCode: string;
   discount: number;
+};
 
-  add: (gameId: string, qty?: number) => void;
-  remove: (gameId: string) => void;
-  setQty: (gameId: string, qty: number) => void;
-  clear: () => void;
+type CartState = {
+  carts: Record<string, UserCart>;
 
-  applyPromo: (code: string) => boolean;
-  clearPromo: () => void;
+  add: (email: string, gameId: string, qty?: number) => void;
+  remove: (email: string, gameId: string) => void;
+
+  setQty: (email: string, gameId: string, qty: number) => void;
+
+  clear: (email: string) => void;
+
+  applyPromo: (email: string, code: string) => boolean;
+
+  clearPromo: (email: string) => void;
+};
+
+const EMPTY_CART: UserCart = {
+  items: [],
+  promoCode: "",
+  discount: 0,
 };
 
 export const useCart = create<CartState>()(
   persist(
     (set) => ({
-      items: [],
+      carts: {},
 
-      promoCode: "",
-      discount: 0,
-
-      add: (gameId, qty = 1) =>
+      add: (email, gameId, qty = 1) =>
         set((s) => {
-          const existing = s.items.find((i) => i.gameId === gameId);
+          const cart = s.carts[email] ?? EMPTY_CART;
 
-          if (existing) {
-            return {
-              items: s.items.map((i) =>
+          const existing = cart.items.find((i) => i.gameId === gameId);
+
+          const items = existing
+            ? cart.items.map((i) =>
                 i.gameId === gameId ? { ...i, quantity: i.quantity + qty } : i,
-              ),
-            };
-          }
+              )
+            : [...cart.items, { gameId, quantity: qty }];
 
           return {
-            items: [...s.items, { gameId, quantity: qty }],
+            carts: {
+              ...s.carts,
+              [email]: {
+                ...cart,
+                items,
+              },
+            },
           };
         }),
 
-      remove: (gameId) =>
-        set((s) => ({
-          items: s.items.filter((i) => i.gameId !== gameId),
-        })),
+      remove: (email, gameId) =>
+        set((s) => {
+          const cart = s.carts[email] ?? EMPTY_CART;
 
-      setQty: (gameId, qty) =>
-        set((s) => ({
-          items: s.items
-            .map((i) =>
-              i.gameId === gameId ? { ...i, quantity: Math.max(1, qty) } : i,
-            )
-            .filter((i) => i.quantity > 0),
-        })),
-
-      clear: () =>
-        set({
-          items: [],
-          promoCode: "",
-          discount: 0,
+          return {
+            carts: {
+              ...s.carts,
+              [email]: {
+                ...cart,
+                items: cart.items.filter((i) => i.gameId !== gameId),
+              },
+            },
+          };
         }),
 
-      applyPromo: (code) => {
+      setQty: (email, gameId, qty) =>
+        set((s) => {
+          const cart = s.carts[email] ?? EMPTY_CART;
+
+          return {
+            carts: {
+              ...s.carts,
+              [email]: {
+                ...cart,
+                items: cart.items
+                  .map((i) =>
+                    i.gameId === gameId
+                      ? {
+                          ...i,
+                          quantity: Math.max(1, qty),
+                        }
+                      : i,
+                  )
+                  .filter((i) => i.quantity > 0),
+              },
+            },
+          };
+        }),
+
+      clear: (email) =>
+        set((s) => ({
+          carts: {
+            ...s.carts,
+            [email]: EMPTY_CART,
+          },
+        })),
+
+      applyPromo: (email, code) => {
         const normalized = code.trim().toUpperCase();
 
-        if (normalized === "GAME10") {
-          set({
-            promoCode: normalized,
-            discount: 0.1,
-          });
+        let discount = 0;
 
-          return true;
+        if (normalized === "GAME10") {
+          discount = 0.1;
         }
 
         if (normalized === "MIR20") {
-          set({
-            promoCode: normalized,
-            discount: 0.2,
-          });
-
-          return true;
+          discount = 0.2;
         }
 
-        set({
-          promoCode: "",
-          discount: 0,
+        set((s) => {
+          const cart = s.carts[email] ?? EMPTY_CART;
+
+          return {
+            carts: {
+              ...s.carts,
+              [email]: {
+                ...cart,
+                promoCode: discount ? normalized : "",
+                discount,
+              },
+            },
+          };
         });
 
-        return false;
+        return discount > 0;
       },
 
-      clearPromo: () =>
-        set({
-          promoCode: "",
-          discount: 0,
+      clearPromo: (email) =>
+        set((s) => {
+          const cart = s.carts[email] ?? EMPTY_CART;
+
+          return {
+            carts: {
+              ...s.carts,
+              [email]: {
+                ...cart,
+                promoCode: "",
+                discount: 0,
+              },
+            },
+          };
         }),
     }),
-    { name: "bg-cart" },
+    {
+      name: "bg-cart",
+    },
   ),
 );

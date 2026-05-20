@@ -1,21 +1,31 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, ShoppingCart, Star, Users, Clock } from "lucide-react";
 import type { BoardGame } from "@/types";
-import { useFavorites } from "@/store/useStore";
+import { useFavorites } from "@/store/useFavorites";
 import { useProfile } from "../store/useProfile";
 import { useCart } from "@/store/useCart";
 
 export function GameCard({ game }: { game: BoardGame }) {
-  const addCart = useCart((s) => s.add);
-  const cartItems = useCart((s) => s.items);
-
-  const fav = useFavorites();
-  const isFav = fav.ids.includes(game.id);
-
   const navigate = useNavigate();
-  const isAuth = useProfile((s) => s.isAuth);
+  const user = useProfile((s) => s.user);
+  const addCart = useCart((s) => s.add);
+  const userCart = useCart((s) => (user ? s.carts[user.email] : undefined));
+  const cart = userCart ?? {
+    items: [],
+    promoCode: "",
+    discount: 0,
+  };
 
-  const inCartQty = cartItems.find((i) => i.gameId === game.id)?.quantity ?? 0;
+  const favorites = useFavorites((s) =>
+    user?.email ? s.favorites[user.email] : undefined,
+  );
+  const favoriteIds = favorites ?? [];
+
+  const toggleFavorite = useFavorites((s) => s.toggle);
+
+  const isFav = favoriteIds.includes(game.id);
+
+  const inCartQty = cart.items.find((i) => i.gameId === game.id)?.quantity ?? 0;
 
   return (
     <div className="group relative bg-card rounded-2xl overflow-hidden card-hover border border-border animate-fade-in">
@@ -55,12 +65,12 @@ export function GameCard({ game }: { game: BoardGame }) {
         onClick={(e) => {
           e.preventDefault();
 
-          if (!isAuth) {
+          if (!user) {
             navigate({ to: "/login" });
             return;
           }
 
-          fav.toggle(game.id);
+          toggleFavorite(user.email, game.id);
         }}
         className="absolute top-3 right-3 p-2.5 rounded-full bg-background/90 backdrop-blur-sm shadow-soft hover:scale-110 transition-transform"
         aria-label="В избранное"
@@ -111,12 +121,12 @@ export function GameCard({ game }: { game: BoardGame }) {
           </div>
           <button
             onClick={() => {
-              if (!isAuth) {
+              if (!user) {
                 navigate({ to: "/login" });
                 return;
               }
 
-              addCart(game.id);
+              addCart(user.email, game.id);
             }}
             disabled={!game.inStock}
             className="p-2.5 rounded-xl gradient-amber text-primary-foreground hover:shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed"

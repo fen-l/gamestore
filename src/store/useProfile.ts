@@ -17,7 +17,6 @@ type User = {
 };
 
 type ProfileState = {
-  isAuth: boolean;
   user: User | null;
 
   register: (
@@ -44,8 +43,6 @@ type ProfileState = {
 export const useProfile = create<ProfileState>()(
   persist(
     (set) => ({
-      isAuth: false,
-
       user: null,
       addresses: [],
       lastUsedAddressId: null,
@@ -97,7 +94,6 @@ export const useProfile = create<ProfileState>()(
         localStorage.setItem("users", JSON.stringify(users));
 
         set({
-          isAuth: true,
           user: {
             name,
             email,
@@ -121,7 +117,6 @@ export const useProfile = create<ProfileState>()(
         }
 
         set({
-          isAuth: true,
           user: {
             name: found.name,
             email: found.email,
@@ -135,7 +130,6 @@ export const useProfile = create<ProfileState>()(
 
       logout: () =>
         set({
-          isAuth: false,
           user: null,
         }),
 

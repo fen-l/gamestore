@@ -1,4 +1,9 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  useNavigate,
+} from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Heart,
@@ -15,8 +20,9 @@ import {
 } from "lucide-react";
 import { GAMES } from "@/data/games";
 import { GameCard } from "@/components/GameCard";
-import { useFavorites } from "@/store/useStore";
+import { useFavorites } from "@/store/useFavorites";
 import { useCart } from "@/store/useCart";
+import { useProfile } from "@/store/useProfile.ts";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
@@ -37,13 +43,25 @@ function ProductPage() {
   const [lightbox, setLightbox] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
-  const { items, setQty: setCartQty } = useCart();
-  const cartItem = items.find((i) => i.gameId === game.id);
+  const { setQty: setCartQty } = useCart();
+  const user = useProfile((s) => s.user);
+  const userCart = useCart((s) => (user ? s.carts[user.email] : undefined));
+  const cart = userCart ?? {
+    items: [],
+    promoCode: "",
+    discount: 0,
+  };
+  const cartItem = cart.items.find((i) => i.gameId === game.id);
   const qty = cartItem?.quantity ?? 1;
 
   const addCart = useCart((s) => s.add);
   const fav = useFavorites();
-  const isFav = fav.ids.includes(game.id);
+  const favorites = useFavorites((s) =>
+    user?.email ? s.favorites[user.email] : undefined,
+  );
+  const favoriteIds = favorites ?? [];
+  const isFav = favoriteIds.includes(game.id);
+  const navigate = useNavigate();
 
   const similar = GAMES.filter(
     (g) => g.id !== game.id && g.genres.some((x) => game.genres.includes(x)),
@@ -68,7 +86,6 @@ function ProductPage() {
       </nav>
 
       <div className="grid lg:grid-cols-2 gap-10">
-        {/* Gallery */}
         <div className="space-y-4">
           <button
             onClick={() => setLightbox(true)}
@@ -102,7 +119,6 @@ function ProductPage() {
           </div>
         </div>
 
-        {/* Info */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             {game.isBestseller && (
@@ -192,7 +208,16 @@ function ProductPage() {
             <div className="flex gap-3">
               <div className="flex items-center bg-muted rounded-xl">
                 <button
-                  onClick={() => setCartQty(game.id, Math.max(1, qty - 1))}
+                  onClick={(e) => {
+                    e.preventDefault();
+
+                    if (!user) {
+                      navigate({ to: "/login" });
+                      return;
+                    }
+
+                    setCartQty(user.email, game.id, Math.max(1, qty - 1));
+                  }}
                   className="p-3 hover:bg-accent rounded-l-xl"
                 >
                   <Minus className="w-4 h-4" />
@@ -201,21 +226,48 @@ function ProductPage() {
                 <span className="px-4 font-bold w-10 text-center">{qty}</span>
 
                 <button
-                  onClick={() => setCartQty(game.id, qty + 1)}
+                  onClick={(e) => {
+                    e.preventDefault();
+
+                    if (!user) {
+                      navigate({ to: "/login" });
+                      return;
+                    }
+
+                    setCartQty(user.email, game.id, Math.max(1, qty + 1));
+                  }}
                   className="p-3 hover:bg-accent rounded-r-xl"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
               <button
-                onClick={() => addCart(game.id, qty)}
+                onClick={(e) => {
+                  e.preventDefault();
+
+                  if (!user) {
+                    navigate({ to: "/login" });
+                    return;
+                  }
+
+                  addCart(user.email, game.id, 1);
+                }}
                 disabled={!game.inStock}
                 className="flex-1 py-3 px-6 rounded-xl gradient-amber text-primary-foreground font-bold hover:shadow-glow transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <ShoppingCart className="w-5 h-5" /> В корзину
               </button>
               <button
-                onClick={() => fav.toggle(game.id)}
+                onClick={(e) => {
+                  e.preventDefault();
+
+                  if (!user) {
+                    navigate({ to: "/login" });
+                    return;
+                  }
+
+                  fav.toggle(user.email, game.id);
+                }}
                 className="p-3 rounded-xl border border-border hover:bg-accent transition"
                 aria-label="В избранное"
               >
@@ -367,7 +419,6 @@ function ProductPage() {
         </div>
       </div>
 
-      {/* Recommendations */}
       {[
         { title: "Похожие игры", items: similar },
         { title: "Часто покупают вместе", items: bundle },
@@ -386,7 +437,6 @@ function ProductPage() {
           ),
       )}
 
-      {/* Lightbox */}
       {lightbox && (
         <div
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 animate-fade-in"

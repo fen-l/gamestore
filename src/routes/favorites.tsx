@@ -1,17 +1,32 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
-import { useFavorites } from "@/store/useStore";
+import { useFavorites } from "@/store/useFavorites";
 import { GAMES } from "@/data/games";
 import { GameCard } from "@/components/GameCard";
+import { useProfile } from "@/store/useProfile.ts";
 
 export const Route = createFileRoute("/favorites")({
+  beforeLoad: () => {
+    const auth = useProfile.getState();
+
+    if (!auth.user) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
+
   component: FavoritesPage,
   head: () => ({ meta: [{ title: "Избранное — МирИгр" }] }),
 });
 
 function FavoritesPage() {
-  const ids = useFavorites((s) => s.ids);
-  const favs = GAMES.filter((g) => ids.includes(g.id));
+  const user = useProfile((s) => s.user);
+  const favorites = useFavorites((s) =>
+    user?.email ? s.favorites[user.email] : undefined,
+  );
+  const favIds = favorites ?? [];
+  const favs = GAMES.filter((g) => favIds.includes(g.id));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -23,14 +38,21 @@ function FavoritesPage() {
             <Heart className="w-12 h-12 text-primary" />
           </div>
           <h2 className="text-2xl font-bold mb-2">Здесь пока пусто</h2>
-          <p className="text-muted-foreground mb-8">Сохраняйте понравившиеся игры, чтобы вернуться к ним позже</p>
-          <Link to="/catalog" className="inline-block px-7 py-3.5 rounded-2xl gradient-amber text-primary-foreground font-bold shadow-soft hover:shadow-glow transition">
+          <p className="text-muted-foreground mb-8">
+            Сохраняйте понравившиеся игры, чтобы вернуться к ним позже
+          </p>
+          <Link
+            to="/catalog"
+            className="inline-block px-7 py-3.5 rounded-2xl gradient-amber text-primary-foreground font-bold shadow-soft hover:shadow-glow transition"
+          >
             Перейти в каталог
           </Link>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {favs.map((g) => <GameCard key={g.id} game={g} />)}
+          {favs.map((g) => (
+            <GameCard key={g.id} game={g} />
+          ))}
         </div>
       )}
     </div>
