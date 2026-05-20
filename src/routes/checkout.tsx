@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Truck, CreditCard, Wallet, Tag } from "lucide-react";
 import { useCart } from "@/store/useCart";
@@ -7,12 +7,28 @@ import { GAMES } from "@/data/games";
 import { useOrders } from "@/store/useOrders";
 
 export const Route = createFileRoute("/checkout")({
+  beforeLoad: () => {
+    const auth = useProfile.getState();
+
+    if (!auth.user) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
   component: CheckoutPage,
   head: () => ({ meta: [{ title: "Оформление заказа — МирИгр" }] }),
 });
 
 function CheckoutPage() {
-  const { items, clear, promoCode, discount } = useCart();
+  const user = useProfile((s) => s.user);
+  const userCart = useCart((s) => (user ? s.carts[user.email] : undefined));
+  const cart = userCart ?? {
+    items: [],
+    promoCode: "",
+    discount: 0,
+  };
+  const { clear } = useCart();
   const addOrder = useOrders((s) => s.addOrder);
 
   const navigate = useNavigate();
@@ -40,7 +56,7 @@ function CheckoutPage() {
 
   const [agree, setAgree] = useState(false);
 
-  const detailed = items
+  const detailed = cart.items
     .map((i) => ({
       ...i,
       game: GAMES.find((g) => g.id === i.gameId)!,
@@ -49,7 +65,7 @@ function CheckoutPage() {
 
   const subtotal = detailed.reduce((s, i) => s + i.game.price * i.quantity, 0);
 
-  const discountAmt = Math.round(subtotal * discount);
+  const discountAmt = Math.round(subtotal * cart.discount);
 
   const deliveryCost =
     delivery === "courier"
@@ -64,21 +80,28 @@ function CheckoutPage() {
 
   const total = subtotal - discountAmt + deliveryCost;
 
+  const [error, setError] = useState("");
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
+    if (!user) {
+      return;
+    }
 
     if (!agree) {
-      alert("Согласитесь с условиями");
+      setError("Подтвердите согласие с условиями оформления заказа");
       return;
     }
 
     const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
-    if (!selectedAddress) {
-      alert("Выберите адрес доставки");
+    if (!selectedAddress && delivery !== "pickup") {
+      setError("Выберите адрес доставки");
       return;
     }
 
-    const orderId = addOrder({
+    const orderId = addOrder(user.email, {
       items: detailed.map((i) => ({
         gameId: i.gameId,
         title: i.game.title,
@@ -93,18 +116,20 @@ function CheckoutPage() {
     });
 
     setTimeout(() => {
-      useOrders.getState().updateStatus(orderId, "В пути");
+      useOrders.getState().updateStatus(user.email, orderId, "В пути");
     }, 60000); //через минуту будет статус в пути
 
     setTimeout(() => {
-      useOrders.getState().updateStatus(orderId, "Доставлен");
+      useOrders.getState().updateStatus(user.email, orderId, "Доставлен");
     }, 360000); //через 6 минут статус станет доставлен
 
-    clear();
-
-    alert("Заказ успешно оформлен!");
-
-    navigate({ to: "/" });
+    clear(user.email);
+    navigate({
+      to: "/profile",
+      search: {
+        tab: "orders",
+      },
+    });
   };
 
   if (detailed.length === 0) {
@@ -187,6 +212,7 @@ function CheckoutPage() {
                       onChange={() => {
                         setSelectedAddressId(a.id);
                         setLastUsedAddressId(a.id);
+                        setError("");
                       }}
                       className="accent-primary mt-1"
                     />
@@ -340,12 +366,12 @@ function CheckoutPage() {
             </div>
 
             <div className="pt-4 border-t border-border mb-4">
-              {promoCode && discount > 0 ? (
+              {cart.promoCode && cart.discount > 0 ? (
                 <div className="flex items-center gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-3 text-sm text-green-600">
                   <Tag className="w-4 h-4" />
 
                   <span>
-                    Промокод <span className="font-bold">{promoCode}</span>{" "}
+                    Промокод <span className="font-bold">{cart.promoCode}</span>{" "}
                     применён
                   </span>
                 </div>
@@ -386,12 +412,19 @@ function CheckoutPage() {
                 <span>{total.toLocaleString("ru-RU")} руб</span>
               </div>
             </div>
-
+            {error && (
+              <div className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive animate-fade-in">
+                {error}
+              </div>
+            )}
             <label className="flex items-start gap-2 mt-5 text-xs text-muted-foreground cursor-pointer">
               <input
                 type="checkbox"
                 checked={agree}
-                onChange={(e) => setAgree(e.target.checked)}
+                onChange={(e) => {
+                  setAgree(e.target.checked);
+                  setError("");
+                }}
                 className="mt-0.5 accent-primary"
               />
               Я согласен с условиями обработки персональных данных и публичной

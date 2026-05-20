@@ -1,4 +1,9 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Trash2,
@@ -14,6 +19,15 @@ import { GameCard } from "@/components/GameCard";
 import { useProfile } from "@/store/useProfile.ts";
 
 export const Route = createFileRoute("/cart")({
+  beforeLoad: () => {
+    const auth = useProfile.getState();
+
+    if (!auth.user) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
   component: CartPage,
   head: () => ({ meta: [{ title: "Корзина — МирИгр" }] }),
 });

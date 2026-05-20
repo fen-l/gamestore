@@ -15,7 +15,9 @@ export const Route = createFileRoute("/profile")({
       });
     }
   },
-
+  validateSearch: (search) => ({
+    tab: typeof search.tab === "string" ? search.tab : "info",
+  }),
   component: ProfilePage,
   head: () => ({ meta: [{ title: "Профиль — МирИгр" }] }),
 });
@@ -27,11 +29,14 @@ const TABS = [
 ] as const;
 
 function ProfilePage() {
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("info");
+  const { tab = "info" } = Route.useSearch();
   const navigate = useNavigate();
 
   const { user, updateUser, addresses, addAddress, logout } = useProfile();
-  const orders = useOrders((s) => s.orders);
+  const userOrders = useOrders((s) =>
+    user ? s.orders[user.email] : undefined,
+  );
+  const orders = userOrders ?? [];
   const [form, setForm] = useState({
     label: "",
     city: "Минск",
@@ -62,7 +67,14 @@ function ProfilePage() {
           {TABS.map((t) => (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() =>
+                navigate({
+                  to: "/profile",
+                  search: {
+                    tab: t.id,
+                  },
+                })
+              }
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition ${
                 tab === t.id
                   ? "gradient-amber text-primary-foreground shadow-soft"
@@ -172,7 +184,12 @@ function ProfilePage() {
                               "-"
                             )}
                           </td>
-                          <td>{o.items.length}</td>
+                          <td>
+                            {o.items.reduce(
+                              (sum, item) => sum + item.quantity,
+                              0,
+                            )}
+                          </td>
                           <td className="font-semibold">
                             {o.total.toLocaleString("ru-RU")} руб
                           </td>
