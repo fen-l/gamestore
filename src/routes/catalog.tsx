@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { GAMES, GENRES, PUBLISHERS } from "@/data/games";
 import { GameCard } from "@/components/GameCard";
 import { Link } from "@tanstack/react-router";
+import { useReviews } from "@/store/useReviews";
 
 type CatalogSearch = {
   q?: string;
@@ -42,6 +43,7 @@ function CatalogPage() {
   const [sort, setSort] = useState<string>("popular");
   const [visible, setVisible] = useState(8);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const getGameStats = useReviews((s) => s.getGameStats);
 
   const filtered = useMemo(() => {
     let res = GAMES.filter((g) => {
@@ -59,12 +61,21 @@ function CatalogPage() {
         return false;
       if (age && g.ageMin > age) return false;
       if (g.price > priceMax) return false;
-      if (g.rating < minRating) return false;
+      const stats = getGameStats(g.id);
+
+      if (stats.rating < minRating) return false;
       return !(selectedPubs.length && !selectedPubs.includes(g.publisher));
     });
     if (sort === "price-asc") res = [...res].sort((a, b) => a.price - b.price);
     if (sort === "price-desc") res = [...res].sort((a, b) => b.price - a.price);
-    if (sort === "rating") res = [...res].sort((a, b) => b.rating - a.rating);
+    if (sort === "rating") {
+      res = [...res].sort((a, b) => {
+        const aRating = useReviews.getState().getGameStats(a.id).rating;
+        const bRating = useReviews.getState().getGameStats(b.id).rating;
+
+        return bRating - aRating;
+      });
+    }
     if (sort === "new") res = [...res].sort((a) => (a.isNew ? -1 : 1));
     return res;
   }, [

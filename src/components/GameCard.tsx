@@ -4,6 +4,7 @@ import type { BoardGame } from "@/types";
 import { useFavorites } from "@/store/useFavorites";
 import { useProfile } from "../store/useProfile";
 import { useCart } from "@/store/useCart";
+import { useReviews } from "@/store/useReviews";
 
 export function GameCard({ game }: { game: BoardGame }) {
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ export function GameCard({ game }: { game: BoardGame }) {
   const isFav = favoriteIds.includes(game.id);
 
   const inCartQty = cart.items.find((i) => i.gameId === game.id)?.quantity ?? 0;
+  const getGameStats = useReviews((s) => s.getGameStats);
+  const stats = getGameStats(game.id);
 
   return (
     <div className="group relative bg-card rounded-2xl overflow-hidden card-hover border border-border animate-fade-in">
@@ -83,8 +86,16 @@ export function GameCard({ game }: { game: BoardGame }) {
       <div className="p-4">
         <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
           <Star className="w-3.5 h-3.5 fill-primary text-primary" />
-          <span className="font-semibold text-foreground">{game.rating}</span>
-          <span>({game.reviewCount})</span>
+          <span className="font-semibold text-foreground">
+            {stats.rating || "Новый"}
+          </span>
+          <Link
+            to="/product/$id"
+            params={{ id: game.id }}
+            className="hover:text-primary transition-colors"
+          >
+            ({stats.reviewCount} отзывов)
+          </Link>
           <span className="ml-auto">{game.publisher}</span>
         </div>
         <Link to="/product/$id" params={{ id: game.id }}>

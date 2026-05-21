@@ -1,20 +1,9 @@
-export type Review = {
-  id: string;
-  author: string;
-  avatar?: string;
-  rating: number;
-  date: string;
-  text: string;
-};
-
 export type BoardGame = {
   id: string;
   title: string;
   subtitle?: string;
   price: number;
   oldPrice?: number;
-  rating: number;
-  reviewCount: number;
   playersMin: number;
   playersMax: number;
   ageMin: number;
@@ -29,5 +18,4 @@ export type BoardGame = {
   isBestseller?: boolean;
   isNew?: boolean;
   tags: string[];
-  reviews: Review[];
 };

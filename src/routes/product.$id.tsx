@@ -23,6 +23,7 @@ import { GameCard } from "@/components/GameCard";
 import { useFavorites } from "@/store/useFavorites";
 import { useCart } from "@/store/useCart";
 import { useProfile } from "@/store/useProfile.ts";
+import { useReviews } from "@/store/useReviews";
 
 export const Route = createFileRoute("/product/$id")({
   component: ProductPage,
@@ -70,6 +71,14 @@ function ProductPage() {
   const recommend = GAMES.filter(
     (g) => g.id !== game.id && g.isBestseller,
   ).slice(0, 4);
+  const getGameStats = useReviews((s) => s.getGameStats);
+  const stats = getGameStats(id);
+  const allReviews = useReviews((s) => s.reviews);
+  const reviews = allReviews.filter((r) => r.gameId === game.id);
+  const addReview = useReviews((s) => s.addReview);
+  const alreadyReviewed = user
+    ? reviews.some((r) => r.userEmail === user.email)
+    : false;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -147,13 +156,13 @@ function ProductPage() {
               {[1, 2, 3, 4, 5].map((s) => (
                 <Star
                   key={s}
-                  className={`w-5 h-5 ${s <= Math.round(game.rating) ? "fill-primary text-primary" : "text-muted"}`}
+                  className={`w-5 h-5 ${s <= Math.round(stats.rating) ? "fill-primary text-primary" : "text-muted"}`}
                 />
               ))}
-              <span className="ml-2 font-bold">{game.rating}</span>
+              <span className="ml-2 font-bold">{stats.rating}</span>
             </div>
             <span className="text-sm text-muted-foreground">
-              {game.reviewCount} отзывов
+              {stats.reviewCount} отзывов
             </span>
           </div>
 
@@ -297,7 +306,7 @@ function ProductPage() {
               ["desc", "Описание"],
               ["specs", "Характеристики"],
               ["rules", "Правила"],
-              ["reviews", `Отзывы (${game.reviews.length})`],
+              ["reviews", `Отзывы (${reviews.length})`],
             ] as const
           ).map(([k, l]) => (
             <button
@@ -354,15 +363,15 @@ function ProductPage() {
           )}
           {tab === "reviews" && (
             <div className="max-w-3xl space-y-6">
-              {game.reviews.map((r) => (
+              {reviews.map((r) => (
                 <div
                   key={r.id}
                   className="bg-card border border-border rounded-2xl p-5"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <div className="font-bold">{r.author}</div>
+                    <div className="font-bold">{r.userName}</div>
                     <div className="text-xs text-muted-foreground">
-                      {r.date}
+                      {new Date(r.createdAt).toLocaleDateString("ru-RU")}
                     </div>
                   </div>
                   <div className="flex gap-0.5 mb-2">
@@ -377,43 +386,65 @@ function ProductPage() {
                 </div>
               ))}
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setReviewText("");
-                  alert("Спасибо за отзыв!");
-                }}
-                className="bg-card border border-border rounded-2xl p-6"
-              >
-                <h3 className="font-bold text-lg mb-4">Оставить отзыв</h3>
-                <div className="flex gap-1 mb-3">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <button
-                      type="button"
-                      key={s}
-                      onClick={() => setReviewRating(s)}
-                    >
-                      <Star
-                        className={`w-6 h-6 ${s <= reviewRating ? "fill-primary text-primary" : "text-muted"}`}
-                      />
-                    </button>
-                  ))}
+              {alreadyReviewed ? (
+                <div className="bg-muted rounded-2xl p-4 text-sm">
+                  Вы уже оставили отзыв
                 </div>
-                <textarea
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  placeholder="Поделитесь впечатлением..."
-                  required
-                  rows={4}
-                  className="w-full p-3 rounded-xl bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <button
-                  type="submit"
-                  className="mt-3 px-6 py-2.5 rounded-xl gradient-amber text-primary-foreground font-bold"
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+
+                    if (!user) {
+                      navigate({ to: "/login" });
+                      return;
+                    }
+
+                    if (!reviewText.trim()) return;
+
+                    addReview(
+                      game.id,
+                      user.email,
+                      user.name,
+                      reviewRating,
+                      reviewText,
+                    );
+
+                    setReviewText("");
+                    setReviewRating(5);
+                  }}
+                  className="bg-card border border-border rounded-2xl p-6"
                 >
-                  Отправить
-                </button>
-              </form>
+                  <h3 className="font-bold text-lg mb-4">Оставить отзыв</h3>
+                  <div className="flex gap-1 mb-3">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <button
+                        type="button"
+                        key={s}
+                        onClick={() => setReviewRating(s)}
+                      >
+                        <Star
+                          className={`w-6 h-6 ${s <= reviewRating ? "fill-primary text-primary" : "text-muted"}`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    placeholder="Поделитесь впечатлением..."
+                    required
+                    rows={4}
+                    className="w-full p-3 rounded-xl bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                  <button
+                    type="submit"
+                    className="mt-3 px-6 py-2.5 rounded-xl gradient-amber text-primary-foreground font-bold"
+                  >
+                    Отправить
+                  </button>
+                </form>
+              )}
             </div>
           )}
         </div>
