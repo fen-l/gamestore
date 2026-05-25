@@ -122,7 +122,7 @@ function HomePage() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.4),transparent)]" />
               <div className="relative h-full flex flex-col justify-center px-8 sm:px-16 max-w-3xl">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/30 backdrop-blur-sm text-white text-sm font-medium w-fit mb-6 animate-slide-up">
-                  <Sparkles className="w-4 h-4" /> Доставка по всей России
+                  <Sparkles className="w-4 h-4" /> Доставка по всей Беларуси
                 </div>
                 <h1 className="text-4xl sm:text-6xl font-extrabold text-white drop-shadow-lg mb-4 animate-slide-up">
                   {s.title}
@@ -247,7 +247,7 @@ function HomePage() {
               {
                 icon: Truck,
                 title: "Быстрая доставка",
-                desc: "По Москве в день заказа",
+                desc: "По Минску в день заказа",
               },
               {
                 icon: Shield,
@@ -319,7 +319,7 @@ function HomePage() {
         </h2>
         <p>
           Добро пожаловать в МирИгр — крупнейший онлайн-магазин настольных игр в
-          России. У нас вы найдёте более 5000 наименований для любого возраста и
+          Беларуси. У нас вы найдёте более 5000 наименований для любого возраста и
           компании: классические семейные игры, глубокие стратегии, динамичные
           вечериночные и захватывающие кооперативные приключения.
         </p>
