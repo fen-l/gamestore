@@ -37,7 +37,7 @@ function CatalogPage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [players, setPlayers] = useState<number>(0);
   const [age, setAge] = useState<number>(0);
-  const [priceMax, setPriceMax] = useState<number>(12000);
+  const [priceMax, setPriceMax] = useState<number>(500);
   const [minRating, setMinRating] = useState<number>(0);
   const [selectedPubs, setSelectedPubs] = useState<string[]>([]);
   const [sort, setSort] = useState<string>("popular");
@@ -235,9 +235,9 @@ function CatalogPage() {
         </label>
         <input
           type="range"
-          min={500}
-          max={12000}
-          step={100}
+          min={20}
+          max={500}
+          step={5}
           value={priceMax}
           onChange={(e) => setPriceMax(+e.target.value)}
           className="w-full accent-primary"
