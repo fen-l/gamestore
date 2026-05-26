@@ -33,8 +33,7 @@ function CheckoutPage() {
 
   const navigate = useNavigate();
 
-  const { addresses, addAddress, lastUsedAddressId, setLastUsedAddressId } =
-    useProfile();
+  const { addresses, addAddress, lastUsedAddressId, setLastUsedAddressId } = useProfile();
 
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
@@ -48,9 +47,9 @@ function CheckoutPage() {
     comment: "",
   });
 
-  const [delivery, setDelivery] = useState<
-    "courier" | "pickup" | "euro-post" | "bel-post"
-  >("courier");
+  const [delivery, setDelivery] = useState<"courier" | "pickup" | "euro-post" | "bel-post">(
+    "courier",
+  );
 
   const [payment, setPayment] = useState<"card" | "cash">("card");
 
@@ -223,9 +222,7 @@ function CheckoutPage() {
                         {a.city}, {a.address}
                       </div>
                       {a.comment && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {a.comment}
-                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">{a.comment}</div>
                       )}
                     </div>
                   </label>
@@ -244,36 +241,28 @@ function CheckoutPage() {
                     <input
                       placeholder="Название (Дом, Работа)"
                       value={form.label}
-                      onChange={(e) =>
-                        setForm({ ...form, label: e.target.value })
-                      }
+                      onChange={(e) => setForm({ ...form, label: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl bg-muted"
                     />
 
                     <input
                       placeholder="Город"
                       value={form.city}
-                      onChange={(e) =>
-                        setForm({ ...form, city: e.target.value })
-                      }
+                      onChange={(e) => setForm({ ...form, city: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl bg-muted"
                     />
 
                     <input
                       placeholder="Адрес"
                       value={form.address}
-                      onChange={(e) =>
-                        setForm({ ...form, address: e.target.value })
-                      }
+                      onChange={(e) => setForm({ ...form, address: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl bg-muted"
                     />
 
                     <textarea
                       placeholder="Комментарий"
                       value={form.comment}
-                      onChange={(e) =>
-                        setForm({ ...form, comment: e.target.value })
-                      }
+                      onChange={(e) => setForm({ ...form, comment: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl bg-muted"
                     />
 
@@ -349,9 +338,7 @@ function CheckoutPage() {
                   />
 
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold line-clamp-1">
-                      {i.game.title}
-                    </div>
+                    <div className="text-sm font-semibold line-clamp-1">{i.game.title}</div>
 
                     <div className="text-xs text-muted-foreground">
                       {i.quantity} × {i.game.price.toLocaleString("ru-RU")} руб
@@ -371,8 +358,7 @@ function CheckoutPage() {
                   <Tag className="w-4 h-4" />
 
                   <span>
-                    Промокод <span className="font-bold">{cart.promoCode}</span>{" "}
-                    применён
+                    Промокод <span className="font-bold">{cart.promoCode}</span> применён
                   </span>
                 </div>
               ) : (
@@ -401,9 +387,7 @@ function CheckoutPage() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Доставка</span>
 
-                <span>
-                  {deliveryCost === 0 ? "Бесплатно" : `${deliveryCost} руб`}
-                </span>
+                <span>{deliveryCost === 0 ? "Бесплатно" : `${deliveryCost} руб`}</span>
               </div>
 
               <div className="flex justify-between text-xl font-bold pt-3 border-t border-border">
@@ -427,8 +411,7 @@ function CheckoutPage() {
                 }}
                 className="mt-0.5 accent-primary"
               />
-              Я согласен с условиями обработки персональных данных и публичной
-              офертой
+              Я согласен с условиями обработки персональных данных и публичной офертой
             </label>
 
             <button

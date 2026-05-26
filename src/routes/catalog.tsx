@@ -14,10 +14,7 @@ type CatalogSearch = {
 export const Route = createFileRoute("/catalog")({
   validateSearch: (s: Record<string, unknown>): CatalogSearch => ({
     q: typeof s.q === "string" ? s.q : undefined,
-    filter:
-      s.filter === "new" || s.filter === "hit" || s.filter === "sale"
-        ? s.filter
-        : undefined,
+    filter: s.filter === "new" || s.filter === "hit" || s.filter === "sale" ? s.filter : undefined,
   }),
   component: CatalogPage,
   head: () => ({
@@ -50,15 +47,9 @@ function CatalogPage() {
       if (filter === "new" && !g.isNew) return false;
       if (filter === "hit" && !g.isBestseller) return false;
       if (filter === "sale" && !g.oldPrice) return false;
-      if (search && !g.title.toLowerCase().includes(search.toLowerCase()))
-        return false;
-      if (
-        selectedGenres.length &&
-        !selectedGenres.some((x) => g.genres.includes(x))
-      )
-        return false;
-      if (players && (g.playersMin > players || g.playersMax < players))
-        return false;
+      if (search && !g.title.toLowerCase().includes(search.toLowerCase())) return false;
+      if (selectedGenres.length && !selectedGenres.some((x) => g.genres.includes(x))) return false;
+      if (players && (g.playersMin > players || g.playersMax < players)) return false;
       if (age && g.ageMin > age) return false;
       if (g.price > priceMax) return false;
       const stats = getGameStats(g.id);
@@ -78,17 +69,7 @@ function CatalogPage() {
     }
     if (sort === "new") res = [...res].sort((a) => (a.isNew ? -1 : 1));
     return res;
-  }, [
-    filter,
-    search,
-    selectedGenres,
-    players,
-    age,
-    priceMax,
-    minRating,
-    selectedPubs,
-    sort,
-  ]);
+  }, [filter, search, selectedGenres, players, age, priceMax, minRating, selectedPubs, sort]);
 
   const toggleArr = (arr: string[], v: string, set: (v: string[]) => void) =>
     set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
@@ -128,9 +109,7 @@ function CatalogPage() {
               filter: undefined,
             })}
             className={`px-3 py-2 rounded-xl text-xs font-semibold transition ${
-              !filter
-                ? "gradient-amber text-primary-foreground"
-                : "bg-muted hover:bg-accent"
+              !filter ? "gradient-amber text-primary-foreground" : "bg-muted hover:bg-accent"
             }`}
           >
             Все
@@ -216,9 +195,7 @@ function CatalogPage() {
       </div>
 
       <div>
-        <label className="text-sm font-bold mb-2 block">
-          Возраст {age ? `: ${age}+` : ""}
-        </label>
+        <label className="text-sm font-bold mb-2 block">Возраст {age ? `: ${age}+` : ""}</label>
         <input
           type="range"
           min={0}
@@ -332,9 +309,7 @@ function CatalogPage() {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="text-center py-20 text-muted-foreground">
-              Ничего не найдено
-            </div>
+            <div className="text-center py-20 text-muted-foreground">Ничего не найдено</div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -359,10 +334,7 @@ function CatalogPage() {
 
       {filtersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setFiltersOpen(false)}
-          />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setFiltersOpen(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[90vw] bg-background overflow-y-auto p-6 animate-slide-up">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold">Фильтры</h3>

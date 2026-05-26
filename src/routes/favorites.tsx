@@ -22,9 +22,7 @@ export const Route = createFileRoute("/favorites")({
 
 function FavoritesPage() {
   const user = useProfile((s) => s.user);
-  const favorites = useFavorites((s) =>
-    user?.email ? s.favorites[user.email] : undefined,
-  );
+  const favorites = useFavorites((s) => (user?.email ? s.favorites[user.email] : undefined));
   const favIds = favorites ?? [];
   const favs = GAMES.filter((g) => favIds.includes(g.id));
 

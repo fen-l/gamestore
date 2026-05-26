@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  notFound,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Heart,
@@ -38,9 +33,7 @@ function ProductPage() {
   const { id } = Route.useParams();
   const game = GAMES.find((g) => g.id === id)!;
   const [imgIdx, setImgIdx] = useState(0);
-  const [tab, setTab] = useState<"desc" | "specs" | "rules" | "reviews">(
-    "desc",
-  );
+  const [tab, setTab] = useState<"desc" | "specs" | "rules" | "reviews">("desc");
   const [lightbox, setLightbox] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
@@ -57,9 +50,7 @@ function ProductPage() {
 
   const addCart = useCart((s) => s.add);
   const fav = useFavorites();
-  const favorites = useFavorites((s) =>
-    user?.email ? s.favorites[user.email] : undefined,
-  );
+  const favorites = useFavorites((s) => (user?.email ? s.favorites[user.email] : undefined));
   const favoriteIds = favorites ?? [];
   const isFav = favoriteIds.includes(game.id);
   const navigate = useNavigate();
@@ -68,17 +59,13 @@ function ProductPage() {
     (g) => g.id !== game.id && g.genres.some((x) => game.genres.includes(x)),
   ).slice(0, 4);
   const bundle = GAMES.filter((g) => g.id !== game.id).slice(0, 3);
-  const recommend = GAMES.filter(
-    (g) => g.id !== game.id && g.isBestseller,
-  ).slice(0, 4);
+  const recommend = GAMES.filter((g) => g.id !== game.id && g.isBestseller).slice(0, 4);
   const getGameStats = useReviews((s) => s.getGameStats);
   const stats = getGameStats(id);
   const allReviews = useReviews((s) => s.reviews);
   const reviews = allReviews.filter((r) => r.gameId === game.id);
   const addReview = useReviews((s) => s.addReview);
-  const alreadyReviewed = user
-    ? reviews.some((r) => r.userEmail === user.email)
-    : false;
+  const alreadyReviewed = user ? reviews.some((r) => r.userEmail === user.email) : false;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -107,11 +94,7 @@ function ProductPage() {
             />
             {game.oldPrice && (
               <span className="absolute top-4 left-4 px-3 py-1.5 bg-destructive text-destructive-foreground rounded-full text-sm font-bold">
-                -
-                {Math.round(
-                  ((game.oldPrice - game.price) / game.oldPrice) * 100,
-                )}
-                %
+                -{Math.round(((game.oldPrice - game.price) / game.oldPrice) * 100)}%
               </span>
             )}
           </button>
@@ -140,16 +123,10 @@ function ProductPage() {
                 NEW
               </span>
             )}
-            <span className="text-sm text-muted-foreground">
-              {game.publisher}
-            </span>
+            <span className="text-sm text-muted-foreground">{game.publisher}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold mb-2">{game.title}</h1>
-          {game.subtitle && (
-            <p className="text-lg text-muted-foreground mb-4">
-              {game.subtitle}
-            </p>
-          )}
+          {game.subtitle && <p className="text-lg text-muted-foreground mb-4">{game.subtitle}</p>}
 
           <div className="flex items-center gap-4 mb-6">
             <div className="flex items-center gap-1">
@@ -161,9 +138,7 @@ function ProductPage() {
               ))}
               <span className="ml-2 font-bold">{stats.rating}</span>
             </div>
-            <span className="text-sm text-muted-foreground">
-              {stats.reviewCount} отзывов
-            </span>
+            <span className="text-sm text-muted-foreground">{stats.reviewCount} отзывов</span>
           </div>
 
           <p className="text-foreground/80 mb-6">{game.shortDescription}</p>
@@ -182,10 +157,7 @@ function ProductPage() {
               },
               { icon: Award, label: "Возраст", val: `${game.ageMin}+` },
             ].map((s, i) => (
-              <div
-                key={i}
-                className="bg-card border border-border rounded-2xl p-4 text-center"
-              >
+              <div key={i} className="bg-card border border-border rounded-2xl p-4 text-center">
                 <s.icon className="w-5 h-5 mx-auto text-primary mb-1.5" />
                 <div className="text-xs text-muted-foreground">{s.label}</div>
                 <div className="font-bold">{s.val}</div>
@@ -205,9 +177,7 @@ function ProductPage() {
               )}
               <div className="ml-auto text-sm">
                 {game.inStock ? (
-                  <span className="text-green-600 font-semibold">
-                    В наличии
-                  </span>
+                  <span className="text-green-600 font-semibold">В наличии</span>
                 ) : (
                   <span className="text-destructive">Нет в наличии</span>
                 )}
@@ -280,9 +250,7 @@ function ProductPage() {
                 className="p-3 rounded-xl border border-border hover:bg-accent transition"
                 aria-label="В избранное"
               >
-                <Heart
-                  className={`w-5 h-5 ${isFav ? "fill-destructive text-destructive" : ""}`}
-                />
+                <Heart className={`w-5 h-5 ${isFav ? "fill-destructive text-destructive" : ""}`} />
               </button>
             </div>
           </div>
@@ -325,9 +293,7 @@ function ProductPage() {
 
         <div className="animate-fade-in">
           {tab === "desc" && (
-            <p className="text-foreground/80 leading-relaxed max-w-3xl">
-              {game.description}
-            </p>
+            <p className="text-foreground/80 leading-relaxed max-w-3xl">{game.description}</p>
           )}
           {tab === "specs" && (
             <dl className="grid sm:grid-cols-2 gap-x-8 max-w-3xl">
@@ -339,10 +305,7 @@ function ProductPage() {
                 ["Время партии", `${game.playTimeMin}–${game.playTimeMax} мин`],
                 ["В наличии", game.inStock ? "Да" : "Нет"],
               ].map(([k, v]) => (
-                <div
-                  key={k}
-                  className="flex justify-between py-3 border-b border-border"
-                >
+                <div key={k} className="flex justify-between py-3 border-b border-border">
                   <dt className="text-muted-foreground">{k}</dt>
                   <dd className="font-semibold text-right">{v}</dd>
                 </div>
@@ -352,22 +315,19 @@ function ProductPage() {
           {tab === "rules" && (
             <div className="prose max-w-3xl text-foreground/80 space-y-3">
               <p>
-                Базовые правила игры включают подготовку поля, раздачу
-                компонентов и по очереди ход каждого игрока.
+                Базовые правила игры включают подготовку поля, раздачу компонентов и по очереди ход
+                каждого игрока.
               </p>
               <p>
-                Полные правила прилагаются в коробке. Средняя длительность
-                партии — {game.playTimeMin}–{game.playTimeMax} минут.
+                Полные правила прилагаются в коробке. Средняя длительность партии —{" "}
+                {game.playTimeMin}–{game.playTimeMax} минут.
               </p>
             </div>
           )}
           {tab === "reviews" && (
             <div className="max-w-3xl space-y-6">
               {reviews.map((r) => (
-                <div
-                  key={r.id}
-                  className="bg-card border border-border rounded-2xl p-5"
-                >
+                <div key={r.id} className="bg-card border border-border rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="font-bold">{r.userName}</div>
                     <div className="text-xs text-muted-foreground">
@@ -376,10 +336,7 @@ function ProductPage() {
                   </div>
                   <div className="flex gap-0.5 mb-2">
                     {Array.from({ length: r.rating }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className="w-4 h-4 fill-primary text-primary"
-                      />
+                      <Star key={i} className="w-4 h-4 fill-primary text-primary" />
                     ))}
                   </div>
                   <p className="text-foreground/80">{r.text}</p>
@@ -387,9 +344,7 @@ function ProductPage() {
               ))}
 
               {alreadyReviewed ? (
-                <div className="bg-muted rounded-2xl p-4 text-sm">
-                  Вы уже оставили отзыв
-                </div>
+                <div className="bg-muted rounded-2xl p-4 text-sm">Вы уже оставили отзыв</div>
               ) : (
                 <form
                   onSubmit={(e) => {
@@ -402,13 +357,7 @@ function ProductPage() {
 
                     if (!reviewText.trim()) return;
 
-                    addReview(
-                      game.id,
-                      user.email,
-                      user.name,
-                      reviewRating,
-                      reviewText,
-                    );
+                    addReview(game.id, user.email, user.name, reviewRating, reviewText);
 
                     setReviewText("");
                     setReviewRating(5);
@@ -418,11 +367,7 @@ function ProductPage() {
                   <h3 className="font-bold text-lg mb-4">Оставить отзыв</h3>
                   <div className="flex gap-1 mb-3">
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <button
-                        type="button"
-                        key={s}
-                        onClick={() => setReviewRating(s)}
-                      >
+                      <button type="button" key={s} onClick={() => setReviewRating(s)}>
                         <Star
                           className={`w-6 h-6 ${s <= reviewRating ? "fill-primary text-primary" : "text-muted"}`}
                         />
@@ -476,11 +421,7 @@ function ProductPage() {
           <button className="absolute top-6 right-6 text-white p-2">
             <X className="w-6 h-6" />
           </button>
-          <img
-            src={game.images[imgIdx]}
-            alt=""
-            className="max-w-full max-h-full rounded-2xl"
-          />
+          <img src={game.images[imgIdx]} alt="" className="max-w-full max-h-full rounded-2xl" />
         </div>
       )}
     </div>

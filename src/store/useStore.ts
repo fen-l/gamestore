@@ -14,9 +14,7 @@ export const useFavorites = create<FavState>()(
       ids: [],
       toggle: (id) =>
         set((s) => ({
-          ids: s.ids.includes(id)
-            ? s.ids.filter((x) => x !== id)
-            : [...s.ids, id],
+          ids: s.ids.includes(id) ? s.ids.filter((x) => x !== id) : [...s.ids, id],
         })),
       remove: (id) => set((s) => ({ ids: s.ids.filter((x) => x !== id) })),
       has: (id) => get().ids.includes(id),
@@ -44,10 +42,7 @@ export const useTheme = create<ThemeState>()(
       },
       init: () => {
         if (typeof document !== "undefined") {
-          document.documentElement.classList.toggle(
-            "dark",
-            get().theme === "dark",
-          );
+          document.documentElement.classList.toggle("dark", get().theme === "dark");
         }
       },
     }),

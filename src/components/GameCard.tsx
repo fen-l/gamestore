@@ -17,9 +17,7 @@ export function GameCard({ game }: { game: BoardGame }) {
     discount: 0,
   };
 
-  const favorites = useFavorites((s) =>
-    user?.email ? s.favorites[user.email] : undefined,
-  );
+  const favorites = useFavorites((s) => (user?.email ? s.favorites[user.email] : undefined));
   const favoriteIds = favorites ?? [];
 
   const toggleFavorite = useFavorites((s) => s.toggle);
@@ -53,11 +51,7 @@ export function GameCard({ game }: { game: BoardGame }) {
             )}
             {game.oldPrice && (
               <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-destructive text-destructive-foreground shadow-soft">
-                -
-                {Math.round(
-                  ((game.oldPrice - game.price) / game.oldPrice) * 100,
-                )}
-                %
+                -{Math.round(((game.oldPrice - game.price) / game.oldPrice) * 100)}%
               </span>
             )}
           </div>
@@ -86,9 +80,7 @@ export function GameCard({ game }: { game: BoardGame }) {
       <div className="p-4">
         <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
           <Star className="w-3.5 h-3.5 fill-primary text-primary" />
-          <span className="font-semibold text-foreground">
-            {stats.rating || "Новый"}
-          </span>
+          <span className="font-semibold text-foreground">{stats.rating || "Новый"}</span>
           <Link
             to="/product/$id"
             params={{ id: game.id }}
@@ -121,9 +113,7 @@ export function GameCard({ game }: { game: BoardGame }) {
 
         <div className="flex items-end justify-between mt-4">
           <div>
-            <div className="text-lg font-bold">
-              {game.price.toLocaleString("ru-RU")} руб
-            </div>
+            <div className="text-lg font-bold">{game.price.toLocaleString("ru-RU")} руб</div>
             {game.oldPrice && (
               <div className="text-xs text-muted-foreground line-through">
                 {game.oldPrice.toLocaleString("ru-RU")} руб

@@ -15,8 +15,7 @@ export function Footer() {
               <span className="text-xl font-bold text-gradient">МирИгр</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Магазин настольных игр №1. Более 5000 игр для любой компании и
-              возраста.
+              Магазин настольных игр №1. Более 5000 игр для любой компании и возраста.
             </p>
             <div className="flex gap-2 mt-4">
               <a
@@ -95,37 +94,25 @@ export function Footer() {
             <h4 className="font-bold mb-4">Покупателям</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link
-                  to="/delivery"
-                  className="hover:text-primary transition-colors"
-                >
+                <Link to="/delivery" className="hover:text-primary transition-colors">
                   Доставка
                 </Link>
               </li>
 
               <li>
-                <Link
-                  to="/payment"
-                  className="hover:text-primary transition-colors"
-                >
+                <Link to="/payment" className="hover:text-primary transition-colors">
                   Оплата
                 </Link>
               </li>
 
               <li>
-                <Link
-                  to="/returns"
-                  className="hover:text-primary transition-colors"
-                >
+                <Link to="/returns" className="hover:text-primary transition-colors">
                   Возврат
                 </Link>
               </li>
 
               <li>
-                <Link
-                  to="/warranty"
-                  className="hover:text-primary transition-colors"
-                >
+                <Link to="/warranty" className="hover:text-primary transition-colors">
                   Гарантия
                 </Link>
               </li>

@@ -37,10 +37,7 @@ export type Order = {
 type OrdersState = {
   orders: Record<string, Order[]>;
 
-  addOrder: (
-    email: string,
-    order: Omit<Order, "id" | "date" | "status">,
-  ) => string;
+  addOrder: (email: string, order: Omit<Order, "id" | "date" | "status">) => string;
 
   updateStatus: (email: string, id: string, status: OrderStatus) => void;
 

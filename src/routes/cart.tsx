@@ -1,18 +1,6 @@
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  Trash2,
-  Plus,
-  Minus,
-  ShoppingBag,
-  Tag,
-  ArrowRight,
-} from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, Tag, ArrowRight } from "lucide-react";
 import { useCart } from "@/store/useCart";
 import { GAMES } from "@/data/games";
 import { GameCard } from "@/components/GameCard";
@@ -63,9 +51,7 @@ function CartPage() {
     }
   };
 
-  const recommend = GAMES.filter(
-    (g) => !cart.items.some((i) => i.gameId === g.id),
-  ).slice(0, 4);
+  const recommend = GAMES.filter((g) => !cart.items.some((i) => i.gameId === g.id)).slice(0, 4);
 
   if (detailed.length === 0) {
     return (
@@ -98,11 +84,7 @@ function CartPage() {
               key={i.gameId}
               className="bg-card border border-border rounded-2xl p-4 flex gap-4 animate-fade-in"
             >
-              <Link
-                to="/product/$id"
-                params={{ id: i.gameId }}
-                className="shrink-0"
-              >
+              <Link to="/product/$id" params={{ id: i.gameId }} className="shrink-0">
                 <img
                   src={i.game.images[0]}
                   alt={i.game.title}
@@ -111,13 +93,9 @@ function CartPage() {
               </Link>
               <div className="flex-1 min-w-0">
                 <Link to="/product/$id" params={{ id: i.gameId }}>
-                  <h3 className="font-bold line-clamp-1 hover:text-primary">
-                    {i.game.title}
-                  </h3>
+                  <h3 className="font-bold line-clamp-1 hover:text-primary">{i.game.title}</h3>
                 </Link>
-                <p className="text-xs text-muted-foreground">
-                  {i.game.publisher}
-                </p>
+                <p className="text-xs text-muted-foreground">{i.game.publisher}</p>
                 <div className="text-lg font-bold mt-1">
                   {i.game.price.toLocaleString("ru-RU")} руб
                 </div>
@@ -136,9 +114,7 @@ function CartPage() {
                     >
                       <Minus className="w-4 h-4" />
                     </button>
-                    <span className="px-3 font-bold w-8 text-center">
-                      {i.quantity}
-                    </span>
+                    <span className="px-3 font-bold w-8 text-center">{i.quantity}</span>
                     <button
                       onClick={() => {
                         if (!user) {
@@ -190,13 +166,10 @@ function CartPage() {
                 OK
               </button>
             </div>
-            <p className="text-xs text-muted-foreground mb-4">
-              Попробуйте: GAME10 или MIR20
-            </p>
+            <p className="text-xs text-muted-foreground mb-4">Попробуйте: GAME10 или MIR20</p>
             {cart.promoCode && cart.discount > 0 && (
               <div className="mb-4 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm text-green-600">
-                Промокод <span className="font-bold">{cart.promoCode}</span>{" "}
-                применён
+                Промокод <span className="font-bold">{cart.promoCode}</span> применён
               </div>
             )}
 

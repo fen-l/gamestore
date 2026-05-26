@@ -32,9 +32,7 @@ export function Navbar() {
     promoCode: "",
     discount: 0,
   };
-  const favorites = useFavorites((s) =>
-    user ? s.favorites[user.email] : undefined,
-  );
+  const favorites = useFavorites((s) => (user ? s.favorites[user.email] : undefined));
   const favIds = favorites ?? [];
 
   useEffect(() => {
@@ -69,9 +67,7 @@ export function Navbar() {
             <div className="w-10 h-10 rounded-xl gradient-amber flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform">
               <Dice5 className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-gradient hidden sm:block">
-              МирИгр
-            </span>
+            <span className="text-xl font-bold text-gradient hidden sm:block">МирИгр</span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
@@ -88,10 +84,7 @@ export function Navbar() {
             ))}
           </nav>
 
-          <form
-            onSubmit={submitSearch}
-            className="hidden md:flex flex-1 max-w-xs relative"
-          >
+          <form onSubmit={submitSearch} className="hidden md:flex flex-1 max-w-xs relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={query}
@@ -107,11 +100,7 @@ export function Navbar() {
               aria-label="Переключить тему"
               className="p-2.5 rounded-xl hover:bg-accent transition-colors"
             >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
+              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
             {user && (
@@ -152,13 +141,12 @@ export function Navbar() {
             {user ? (
               <>
                 <Link
+                  search={{ tab: "info" }}
                   to="/profile"
                   className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-accent transition"
                 >
                   <User className="w-5 h-5" />
-                  <span className="text-sm font-medium">
-                    {user?.name ?? "Профиль"}
-                  </span>
+                  <span className="text-sm font-medium">{user?.name ?? "Профиль"}</span>
                 </Link>
               </>
             ) : (
@@ -229,6 +217,7 @@ export function Navbar() {
               </Link>
               <Link
                 to="/profile"
+                search={{ tab: "info" }}
                 onClick={() => setOpen(false)}
                 className="px-4 py-2.5 rounded-lg hover:bg-accent text-sm font-medium"
               >

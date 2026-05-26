@@ -9,6 +9,9 @@ export const Route = createFileRoute("/login")({
     if (auth.user) {
       throw redirect({
         to: "/profile",
+        search: {
+          tab: "info",
+        },
       });
     }
   },
@@ -41,7 +44,12 @@ function LoginPage() {
               return;
             }
 
-            navigate({ to: "/profile" });
+            navigate({
+              to: "/profile",
+              search: {
+                tab: "info",
+              },
+            });
           }}
         >
           <div>
@@ -68,9 +76,7 @@ function LoginPage() {
             />
           </div>
 
-          {error && (
-            <div className="text-sm text-destructive font-medium">{error}</div>
-          )}
+          {error && <div className="text-sm text-destructive font-medium">{error}</div>}
 
           <button className="w-full px-6 py-3 rounded-xl gradient-amber text-primary-foreground font-bold">
             Войти
@@ -79,10 +85,7 @@ function LoginPage() {
 
         <p className="text-sm text-muted-foreground mt-5 text-center">
           Нет аккаунта?{" "}
-          <a
-            href="/register"
-            className="text-primary font-semibold hover:underline"
-          >
+          <a href="/register" className="text-primary font-semibold hover:underline">
             Зарегистрироваться
           </a>
         </p>

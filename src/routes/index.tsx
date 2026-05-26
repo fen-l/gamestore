@@ -97,10 +97,7 @@ function HomePage() {
   const [testIdx, setTestIdx] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(
-      () => setSlide((s) => (s + 1) % HERO_SLIDES.length),
-      5000,
-    );
+    const t = setInterval(() => setSlide((s) => (s + 1) % HERO_SLIDES.length), 5000);
     return () => clearInterval(t);
   }, []);
 
@@ -141,9 +138,7 @@ function HomePage() {
           ))}
 
           <button
-            onClick={() =>
-              setSlide((s) => (s - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
-            }
+            onClick={() => setSlide((s) => (s - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
             className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/30 backdrop-blur text-white hover:bg-white/50 transition"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -200,9 +195,7 @@ function HomePage() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <h2 className="text-3xl sm:text-4xl font-bold">Хиты продаж</h2>
-            <p className="text-muted-foreground mt-2">
-              Самые любимые игры наших покупателей
-            </p>
+            <p className="text-muted-foreground mt-2">Самые любимые игры наших покупателей</p>
           </div>
           <Link
             to="/catalog"
@@ -239,9 +232,7 @@ function HomePage() {
       {/* Benefits */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="gradient-amber-soft rounded-3xl p-8 sm:p-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-            Почему выбирают нас
-          </h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">Почему выбирают нас</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
@@ -283,21 +274,15 @@ function HomePage() {
 
       {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-          Отзывы клиентов
-        </h2>
+        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">Отзывы клиентов</h2>
         <div className="relative max-w-3xl mx-auto">
           <div className="bg-card rounded-3xl p-8 sm:p-12 shadow-soft border border-border min-h-55">
             <div className="flex gap-1 mb-4">
-              {Array.from({ length: TESTIMONIALS[testIdx].rating }).map(
-                (_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-primary text-primary" />
-                ),
-              )}
+              {Array.from({ length: TESTIMONIALS[testIdx].rating }).map((_, i) => (
+                <Star key={i} className="w-5 h-5 fill-primary text-primary" />
+              ))}
             </div>
-            <p className="text-lg italic text-foreground/90 mb-6">
-              «{TESTIMONIALS[testIdx].text}»
-            </p>
+            <p className="text-lg italic text-foreground/90 mb-6">«{TESTIMONIALS[testIdx].text}»</p>
             <div className="font-bold">{TESTIMONIALS[testIdx].name}</div>
           </div>
           <div className="flex justify-center gap-2 mt-6">
@@ -314,20 +299,17 @@ function HomePage() {
 
       {/* SEO text */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-sm text-muted-foreground leading-relaxed space-y-3">
-        <h2 className="text-xl font-bold text-foreground">
-          Магазин настольных игр МирИгр
-        </h2>
+        <h2 className="text-xl font-bold text-foreground">Магазин настольных игр МирИгр</h2>
         <p>
-          Добро пожаловать в МирИгр — крупнейший онлайн-магазин настольных игр в
-          Беларуси. У нас вы найдёте более 5000 наименований для любого возраста и
-          компании: классические семейные игры, глубокие стратегии, динамичные
-          вечериночные и захватывающие кооперативные приключения.
+          Добро пожаловать в МирИгр — крупнейший онлайн-магазин настольных игр в Беларуси. У нас вы
+          найдёте более 5000 наименований для любого возраста и компании: классические семейные
+          игры, глубокие стратегии, динамичные вечериночные и захватывающие кооперативные
+          приключения.
         </p>
         <p>
-          Мы тщательно подбираем ассортимент и работаем напрямую с издателями,
-          поэтому гарантируем оригинальность и качество каждой игры. Удобная
-          навигация, честные отзывы и подробные карточки помогут выбрать именно
-          ту настолку, которая подарит часы радости.
+          Мы тщательно подбираем ассортимент и работаем напрямую с издателями, поэтому гарантируем
+          оригинальность и качество каждой игры. Удобная навигация, честные отзывы и подробные
+          карточки помогут выбрать именно ту настолку, которая подарит часы радости.
         </p>
       </section>
     </div>

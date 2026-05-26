@@ -33,9 +33,7 @@ function ProfilePage() {
   const navigate = useNavigate();
 
   const { user, updateUser, addresses, addAddress, logout } = useProfile();
-  const userOrders = useOrders((s) =>
-    user ? s.orders[user.email] : undefined,
-  );
+  const userOrders = useOrders((s) => (user ? s.orders[user.email] : undefined));
   const orders = userOrders ?? [];
   const [form, setForm] = useState({
     label: "",
@@ -108,35 +106,16 @@ function ProfilePage() {
             >
               <h2 className="text-xl font-bold mb-4">Личные данные</h2>
               {[
-                [
-                  "Имя",
-                  user.name,
-                  (value: string) => updateUser({ name: value }),
-                  "text",
-                ],
-                [
-                  "Email",
-                  user.email,
-                  (value: string) => updateUser({ email: value }),
-                  "email",
-                ],
-                [
-                  "Телефон",
-                  user.phone,
-                  (value: string) => updateUser({ phone: value }),
-                  "tel",
-                ],
+                ["Имя", user.name, (value: string) => updateUser({ name: value }), "text"],
+                ["Email", user.email, (value: string) => updateUser({ email: value }), "email"],
+                ["Телефон", user.phone, (value: string) => updateUser({ phone: value }), "tel"],
               ].map(([l, v, set, type]) => (
                 <div key={l as string}>
-                  <label className="text-sm font-semibold mb-1.5 block">
-                    {l as string}
-                  </label>
+                  <label className="text-sm font-semibold mb-1.5 block">{l as string}</label>
                   <input
                     type={type as string}
                     value={v as string}
-                    onChange={(e) =>
-                      (set as (v: string) => void)(e.target.value)
-                    }
+                    onChange={(e) => (set as (v: string) => void)(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-muted focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
@@ -164,15 +143,10 @@ function ProfilePage() {
                   </thead>
                   <tbody>
                     {orders.length === 0 ? (
-                      <div className="text-muted-foreground text-sm">
-                        Заказов пока нет
-                      </div>
+                      <div className="text-muted-foreground text-sm">Заказов пока нет</div>
                     ) : (
                       orders.map((o) => (
-                        <tr
-                          key={o.id}
-                          className="border-b border-border last:border-0"
-                        >
+                        <tr key={o.id} className="border-b border-border last:border-0">
                           <td className="py-4 font-bold">{o.id}</td>
                           <td>{o.date}</td>
                           <td>
@@ -184,15 +158,8 @@ function ProfilePage() {
                               "-"
                             )}
                           </td>
-                          <td>
-                            {o.items.reduce(
-                              (sum, item) => sum + item.quantity,
-                              0,
-                            )}
-                          </td>
-                          <td className="font-semibold">
-                            {o.total.toLocaleString("ru-RU")} руб
-                          </td>
+                          <td>{o.items.reduce((sum, item) => sum + item.quantity, 0)}</td>
+                          <td className="font-semibold">{o.total.toLocaleString("ru-RU")} руб</td>
                           <td>
                             <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
                               {o.status}
@@ -214,10 +181,7 @@ function ProfilePage() {
               <div className="space-y-3">
                 {/* список адресов */}
                 {addresses.map((a) => (
-                  <div
-                    key={a.id}
-                    className="bg-muted rounded-xl p-4 flex items-start gap-3"
-                  >
+                  <div key={a.id} className="bg-muted rounded-xl p-4 flex items-start gap-3">
                     <a
                       href={`https://yandex.ru/maps/?text=${encodeURIComponent(
                         `${a.city}, ${a.address}`,
@@ -235,9 +199,7 @@ function ProfilePage() {
                         {a.city}, {a.address}
                       </div>
                       {a.comment && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {a.comment}
-                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">{a.comment}</div>
                       )}
                     </div>
                   </div>
@@ -251,36 +213,28 @@ function ProfilePage() {
                     <input
                       placeholder="Название (Дом / Работа)"
                       value={form.label}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, label: e.target.value }))
-                      }
+                      onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
                       className="w-full px-4 py-2.5 rounded-xl bg-muted"
                     />
 
                     <input
                       placeholder="Город"
                       value={form.city}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, city: e.target.value }))
-                      }
+                      onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
                       className="w-full px-4 py-2.5 rounded-xl bg-muted"
                     />
 
                     <input
                       placeholder="Адрес"
                       value={form.address}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, address: e.target.value }))
-                      }
+                      onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
                       className="w-full px-4 py-2.5 rounded-xl bg-muted"
                     />
 
                     <textarea
                       placeholder="Комментарий"
                       value={form.comment}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, comment: e.target.value }))
-                      }
+                      onChange={(e) => setForm((f) => ({ ...f, comment: e.target.value }))}
                       className="w-full px-4 py-2.5 rounded-xl bg-muted"
                     />
 

@@ -19,12 +19,7 @@ type User = {
 type ProfileState = {
   user: User | null;
 
-  register: (
-    name: string,
-    email: string,
-    phone: string,
-    password: string,
-  ) => boolean;
+  register: (name: string, email: string, phone: string, password: string) => boolean;
 
   login: (email: string, password: string) => boolean;
 
@@ -70,9 +65,7 @@ export const useProfile = create<ProfileState>()(
 
       updateAddress: (id, data) =>
         set((s) => ({
-          addresses: s.addresses.map((a) =>
-            a.id === id ? { ...a, ...data } : a,
-          ),
+          addresses: s.addresses.map((a) => (a.id === id ? { ...a, ...data } : a)),
         })),
 
       register: (name, email, phone, password) => {
@@ -108,9 +101,7 @@ export const useProfile = create<ProfileState>()(
       login: (email, password) => {
         const users = JSON.parse(localStorage.getItem("users") || "[]");
 
-        const found = users.find(
-          (u: User) => u.email === email && u.password === password,
-        );
+        const found = users.find((u: User) => u.email === email && u.password === password);
 
         if (!found) {
           return false;

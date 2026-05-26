@@ -9,6 +9,9 @@ export const Route = createFileRoute("/register")({
     if (auth.user) {
       throw redirect({
         to: "/profile",
+        search: {
+          tab: "info",
+        },
       });
     }
   },
@@ -45,7 +48,12 @@ function RegisterPage() {
             if (!success) {
               return;
             }
-            navigate({ to: "/profile" });
+            navigate({
+              to: "/profile",
+              search: {
+                tab: "info",
+              },
+            });
           }}
         >
           <div>
@@ -93,9 +101,7 @@ function RegisterPage() {
             />
           </div>
 
-          {error && (
-            <div className="text-sm text-destructive font-medium">{error}</div>
-          )}
+          {error && <div className="text-sm text-destructive font-medium">{error}</div>}
 
           <button className="w-full px-6 py-3 rounded-xl gradient-amber text-primary-foreground font-bold">
             Создать аккаунт
@@ -104,10 +110,7 @@ function RegisterPage() {
 
         <p className="text-sm text-muted-foreground mt-5 text-center">
           Уже есть аккаунт?{" "}
-          <a
-            href="/login"
-            className="text-primary font-semibold hover:underline"
-          >
+          <a href="/login" className="text-primary font-semibold hover:underline">
             Войти
           </a>
         </p>
