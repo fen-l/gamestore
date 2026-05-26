@@ -94,11 +94,11 @@ function ProductPage() {
         <span className="text-foreground">{game.title}</span>
       </nav>
 
-      <div className="grid lg:grid-cols-2 gap-10">
+      <div className="grid lg:grid-cols-[480px_1fr] gap-10 items-start">
         <div className="space-y-4">
           <button
             onClick={() => setLightbox(true)}
-            className="relative aspect-square w-full rounded-3xl overflow-hidden bg-muted shadow-soft block"
+            className="relative aspect-4/5 w-full rounded-3xl overflow-hidden bg-muted shadow-soft block"
           >
             <img
               src={game.images[imgIdx]}

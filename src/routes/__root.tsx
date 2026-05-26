@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       {
         name: "description",
         content:
-          "Каталог настольных игр: стратегии, семейные, вечериночные. Доставка по всей России.",
+          "Каталог настольных игр: стратегии, семейные, вечериночные. Доставка по всей Беларуси.",
       },
       { name: "author", content: "МирИгр" },
       { property: "og:title", content: "МирИгр — настольные игры" },

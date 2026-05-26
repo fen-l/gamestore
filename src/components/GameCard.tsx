@@ -33,7 +33,7 @@ export function GameCard({ game }: { game: BoardGame }) {
   return (
     <div className="group relative bg-card rounded-2xl overflow-hidden card-hover border border-border animate-fade-in">
       <Link to="/product/$id" params={{ id: game.id }} className="block">
-        <div className="relative aspect-square overflow-hidden bg-muted">
+        <div className="relative aspect-4/5 overflow-hidden bg-muted">
           <img
             src={game.images[0]}
             alt={game.title}
